@@ -55,17 +55,11 @@ public class SecurityConfig {
                 // ✅ Let Spring Security add CORS headers on 401/403/preflight too
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .authorizeHttpRequests(auth -> auth
-                        // ✅ Preflight must not be redirected to login
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-
-                        // Public auth endpoints
                         .requestMatchers("/", "/error", "/oauth2/**", "/auth/login/success").permitAll()
-
-                        // ✅ Onboarding endpoints (simplest: permit and validate token manually in controller)
                         .requestMatchers(HttpMethod.GET,  "/api/organizations").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/account/onboarding").permitAll()
-
-                        // Everything else requires auth
+                        .requestMatchers(HttpMethod.POST, "/api/products").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2Login(oauth2 -> oauth2

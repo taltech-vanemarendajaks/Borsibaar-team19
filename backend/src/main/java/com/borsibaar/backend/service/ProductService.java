@@ -7,37 +7,41 @@ import com.borsibaar.backend.entity.Product;
 import com.borsibaar.backend.mapper.ProductMapper;
 import com.borsibaar.backend.repository.CategoryRepository;
 import com.borsibaar.backend.repository.ProductRepository;
+import com.borsibaar.backend.repository.UserRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.time.OffsetDateTime;
 
 @Service
 public class ProductService {
     private final CategoryRepository categoryRepository;
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
+    private final UserRepository userRepository;
 
     public ProductService(ProductRepository productRepository,
                           CategoryRepository categoryRepository,
-                          ProductMapper productMapper) {
+                          ProductMapper productMapper, UserRepository userRepository) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
         this.productMapper = productMapper;
+        this.userRepository = userRepository;
     }
 
     @Transactional
-    public ProductResponseDto create(ProductRequestDto request) {
+    public ProductResponseDto create(ProductRequestDto request, Long orgId) {
         Category cat = categoryRepository.findById(request.categoryId())
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.BAD_REQUEST, "Category not found: " + request.categoryId()));
 
         Product entity = productMapper.toEntity(request);
-
-        // TODO: replace with real tenant/org resolver (e.g., from JWT/subdomain)
-        Long orgId = 1L;
         entity.setOrganizationId(orgId);
         entity.setActive(true);
+        entity.setCreatedAt(OffsetDateTime.now());
+        entity.setUpdatedAt(OffsetDateTime.now());
 
         String normalizedName = entity.getName() != null ? entity.getName().trim() : null;
         if (normalizedName == null || normalizedName.isEmpty()) {
