@@ -10,5 +10,7 @@ public record InventoryResponseDto(
         BigDecimal quantity,
         BigDecimal unitPrice,
         BigDecimal basePrice,
+        BigDecimal minPrice,
+        BigDecimal maxPrice,
         String updatedAt
 ) {}

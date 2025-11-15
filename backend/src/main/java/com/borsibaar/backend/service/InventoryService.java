@@ -67,6 +67,8 @@ public class InventoryService {
                             base.quantity(),
                             unitPrice,
                             product.getBasePrice(),
+                            product.getMinPrice(),
+                            product.getMaxPrice(),
                             base.updatedAt()
                     );
                 })
@@ -103,6 +105,8 @@ public class InventoryService {
                 base.quantity(),
                 unitPrice,
                 basePrice,
+                product.getMinPrice(),
+                product.getMaxPrice(),
                 base.updatedAt()
         );
     }
@@ -155,6 +159,8 @@ public class InventoryService {
                 base.quantity(),
                 currentPrice,
                 null,
+                product.getMinPrice(),
+                product.getMaxPrice(),
                 base.updatedAt()
         );
     }
@@ -204,6 +210,8 @@ public class InventoryService {
                 base.quantity(),
                 currentPrice,
                 null,
+                product.getMinPrice(),
+                product.getMaxPrice(),
                 base.updatedAt()
         );
     }
@@ -247,6 +255,8 @@ public class InventoryService {
                 base.quantity(),
                 currentPrice,
                 null,
+                product.getMinPrice(),
+                product.getMaxPrice(),
                 base.updatedAt()
         );
     }
