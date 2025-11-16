@@ -84,8 +84,8 @@ deploy-job:
         ls -la
         
         # Check if docker-compose.prod.yaml exists
-        if [ ! -f docker-compose.prod.yaml ]; then
-          echo "ERROR: docker-compose.prod.yaml not found!"
+        if [ ! -f $DOCKER_COMPOSE_FILE ]; then
+          echo "ERROR: $DOCKER_COMPOSE_FILE not found!"
           exit 1
         fi
 
@@ -95,17 +95,17 @@ deploy-job:
         fi
         
         # Stop existing containers
-        docker-compose down
+        docker-compose -f $DOCKER_COMPOSE_FILE down
         
         # Rebuild and start containers
-        docker-compose build --no-cache
-        docker-compose up -d
+        docker-compose -f $DOCKER_COMPOSE_FILE build --no-cache
+        docker-compose -f $DOCKER_COMPOSE_FILE up -d
         
         # Clean up old images
         docker image prune -f
         
         echo "Deployment complete!"
-        docker-compose ps
+        docker-compose -f $DOCKER_COMPOSE_FILE ps
         EOF
   environment:
     name: production
