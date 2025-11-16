@@ -1,4 +1,4 @@
-package com.borsibaar.backend;
+package com.borsibaar;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
