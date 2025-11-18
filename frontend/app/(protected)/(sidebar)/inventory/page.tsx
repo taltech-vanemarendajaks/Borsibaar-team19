@@ -562,7 +562,7 @@ export default function Inventory() {
                           {new Date(item.updatedAt).toLocaleString()}
                         </td>
                         <td className="py-3 px-4">
-                          <div className="flex justify-center gap-2">
+                          <div className="flex justify-center gap-2 flex-wrap">
                             <Button
                               onClick={() => openAddModal(item)}
                               className="p-2 text-green-100 bg-green-700 hover:bg-green-800 rounded-lg transition"
