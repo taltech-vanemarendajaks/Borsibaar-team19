@@ -97,7 +97,7 @@ export default function PriceHistoryGraphFancy({
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       const historyJson: HistoryDto[] = await res.json();
       setCurrent({ productInv, priceHistory: historyJson });
-    } catch (e: any) {
+    } catch (e) {
       setError(e?.message || "Failed to fetch history");
     }
   }, []);
@@ -351,7 +351,7 @@ export default function PriceHistoryGraphFancy({
         d3
           .axisLeft<number>(y)
           .ticks(6)
-          .tickFormat((v) => money.format(Number(v)) as any),
+          .tickFormat((v) => money.format(Number(v))),
       )
       .call((s) =>
         s
