@@ -84,8 +84,8 @@ jobs:
             "$SSH_USER@$SERVER_IP" << EOF
           set -e
 
-          mkdir -p "$DEPLOY_PATH"
-          cd "$DEPLOY_PATH"
+          mkdir -p $DEPLOY_PATH
+          cd $DEPLOY_PATH
 
           # Extract deployment package
           tar xzf /tmp/deployment.tar.gz
@@ -109,15 +109,15 @@ jobs:
           # docker image prune -af || true
 
           # Stop existing containers
-          docker-compose -f "$DOCKER_COMPOSE_FILE" down
+          docker compose -f "$DOCKER_COMPOSE_FILE" down
 
           # Rebuild and start containers
-          docker-compose -f "$DOCKER_COMPOSE_FILE" build --no-cache
-          docker-compose -f "$DOCKER_COMPOSE_FILE" up -d
+          docker compose -f "$DOCKER_COMPOSE_FILE" build --no-cache
+          docker compose -f "$DOCKER_COMPOSE_FILE" up -d
 
           # Clean up old images
           # docker image prune -f
 
           echo "Deployment complete!"
-          docker-compose -f "$DOCKER_COMPOSE_FILE" ps
+          docker compose -f "$DOCKER_COMPOSE_FILE" ps
           EOF
