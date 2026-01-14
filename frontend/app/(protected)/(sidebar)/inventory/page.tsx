@@ -32,7 +32,8 @@ import {
 import { useState } from 'react';
 import { useCategories } from './hooks/useCategories';
 import { useInventory } from './hooks/useInventory';
-import { InventoryItem, InventoryTransactionResponseDto } from './types';
+import { useInventoryTransactions } from './hooks/useInventoryTransactions';
+import { InventoryItem } from './types';
 import { filterInventory, getStockStatus } from './utils';
 
 export const dynamic = 'force-dynamic';
@@ -53,10 +54,12 @@ export default function Inventory() {
   const [selectedProduct, setSelectedProduct] = useState<InventoryItem | null>(
     null
   );
-  const [transactionHistory, setTransactionHistory] = useState<
-    InventoryTransactionResponseDto[]
-  >([]);
-  const [loadingHistory, setLoadingHistory] = useState(false);
+  const {
+    transactionHistory,
+    loadingHistory,
+    fetchTransactionHistory,
+    clearHistory,
+  } = useInventoryTransactions();
   const [formData, setFormData] = useState({
     quantity: '',
     notes: '',
@@ -80,27 +83,6 @@ export default function Inventory() {
     notes: '',
   });
 
-  const fetchTransactionHistory = async (productId: number) => {
-    try {
-      setLoadingHistory(true);
-      const response = await fetch(
-        `/api/backend/inventory/product/${productId}/history`,
-        {
-          credentials: 'include',
-        }
-      );
-
-      if (!response.ok) throw new Error('Failed to fetch history');
-
-      const data = await response.json();
-      setTransactionHistory(data);
-    } catch (err) {
-      console.error('Error fetching history:', err);
-      setTransactionHistory([]);
-    } finally {
-      setLoadingHistory(false);
-    }
-  };
 
   const handleCreateProduct = async () => {
     try {
@@ -322,8 +304,7 @@ export default function Inventory() {
     setShowDeleteProductModal(false);
     setSelectedProduct(null);
     setFormData({ quantity: '', notes: '', referenceId: '' });
-    setTransactionHistory([]);
-    setLoadingHistory(false);
+    clearHistory();
   };
 
   const openAddModal = (item: InventoryItem) => {
