@@ -19,6 +19,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { AlertCircle, ListPlus, Package, Plus, User } from 'lucide-react';
 import { useState } from 'react';
+import { AddStockDialog } from './components/AddStockDialog';
 import { InventorySearch } from './components/InventorySearch';
 import { InventoryTable } from './components/InventoryTable';
 import { useCategories } from './hooks/useCategories';
@@ -679,66 +680,18 @@ export default function Inventory() {
         </DialogContent>
       </Dialog>
 
-      <Dialog open={showAddModal} onOpenChange={setShowAddModal}>
-        <DialogContent className="sm:max-w-[500px]">
-          <DialogHeader>
-            <DialogTitle>Add Stock</DialogTitle>
-            <DialogDescription>
-              Increase the stock quantity for the selected product.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="mb-4">
-            <p className="text-sm text-gray-600 mb-2">
-              Product:{' '}
-              <span className="font-semibold">
-                {selectedProduct?.productName}
-              </span>
-            </p>
-            <p className="text-sm text-gray-600">
-              Current Stock:{' '}
-              <span className="font-semibold">{selectedProduct?.quantity}</span>
-            </p>
-          </div>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Quantity to Add
-              </label>
-              <Input
-                type="number"
-                step="0.01"
-                min="0.01"
-                value={formData.quantity}
-                onChange={e =>
-                  setFormData({ ...formData, quantity: e.target.value })
-                }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Enter quantity"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Notes (Optional)
-              </label>
-              <Textarea
-                value={formData.notes}
-                onChange={e =>
-                  setFormData({ ...formData, notes: e.target.value })
-                }
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                rows={3}
-                placeholder="e.g., Weekly restock"
-              />
-            </div>
-            <Button
-              onClick={handleAddStock}
-              className="w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700 transition font-medium"
-            >
-              Add Stock
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      <AddStockDialog
+        open={showAddModal}
+        onOpenChange={setShowAddModal}
+        product={selectedProduct}
+        quantity={formData.quantity}
+        notes={formData.notes}
+        onQuantityChange={value =>
+          setFormData({ ...formData, quantity: value })
+        }
+        onNotesChange={value => setFormData({ ...formData, notes: value })}
+        onConfirm={handleAddStock}
+      />
 
       <Dialog open={showRemoveModal} onOpenChange={setShowRemoveModal}>
         <DialogContent className="sm:max-w-[500px]">
