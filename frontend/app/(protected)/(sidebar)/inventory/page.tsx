@@ -32,13 +32,12 @@ import {
 import { useEffect, useState } from 'react';
 import { InventoryItem, InventoryTransactionResponseDto } from './types';
 import { filterInventory, getStockStatus } from './utils';
+import { useInventory } from './hooks/useInventory';
 
 export const dynamic = 'force-dynamic';
 
 export default function Inventory() {
-  const [inventory, setInventory] = useState<InventoryItem[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const { inventory, loading, error, refetch: refetchInventory } = useInventory();
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddModal, setShowAddModal] = useState(false);
   const [showRemoveModal, setShowRemoveModal] = useState(false);
@@ -78,32 +77,8 @@ export default function Inventory() {
   });
 
   useEffect(() => {
-    fetchInventory();
     fetchCategories();
   }, []);
-
-  const fetchInventory = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch('/api/backend/inventory', {
-        cache: 'no-store',
-      });
-
-      if (!response.ok) throw new Error('Failed to fetch inventory');
-
-      const data = await response.json();
-      setInventory(data);
-      setError(null);
-    } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('An unknown error occurred');
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const fetchCategories = async () => {
     try {
@@ -177,7 +152,7 @@ export default function Inventory() {
         });
       }
 
-      await fetchInventory();
+      await refetchInventory();
       setShowCreateProductModal(false);
       setProductForm({
         name: '',
@@ -218,7 +193,7 @@ export default function Inventory() {
 
       if (!response.ok) throw new Error('Failed to add stock');
 
-      await fetchInventory();
+      await refetchInventory();
       closeModals();
     } catch (err) {
       if (err instanceof Error) {
@@ -253,7 +228,7 @@ export default function Inventory() {
         throw new Error(error.message || 'Failed to remove stock');
       }
 
-      await fetchInventory();
+      await refetchInventory();
       closeModals();
     } catch (err) {
       if (err instanceof Error) {
@@ -284,7 +259,7 @@ export default function Inventory() {
 
       if (!response.ok) throw new Error('Failed to adjust stock');
 
-      await fetchInventory();
+      await refetchInventory();
       closeModals();
     } catch (err) {
       if (err instanceof Error) {
@@ -340,7 +315,7 @@ export default function Inventory() {
       }
 
       setShowDeleteProductModal(false);
-      await fetchInventory();
+      await refetchInventory();
     } catch (err) {
       if (err instanceof Error) {
         alert(err.message);
