@@ -57,3 +57,39 @@ export function validateProductName(
 
   return null;
 }
+
+/**
+ * Validates a price value
+ * Checks for empty value, valid number, and non-negative value
+ * @param price - Price string to validate
+ * @param fieldName - Field name for error message (e.g., "Current price", "Min price")
+ * @returns Validation error or null if valid
+ */
+export function validatePrice(
+  price: string,
+  fieldName: string
+): ValidationError | null {
+  if (!price || price.trim().length === 0) {
+    return {
+      field: fieldName.toLowerCase().replace(' ', ''),
+      message: `${fieldName} is required`,
+    };
+  }
+
+  const priceNum = parseFloat(price);
+  if (isNaN(priceNum)) {
+    return {
+      field: fieldName.toLowerCase().replace(' ', ''),
+      message: `${fieldName} must be a valid number`,
+    };
+  }
+
+  if (priceNum < 0) {
+    return {
+      field: fieldName.toLowerCase().replace(' ', ''),
+      message: `${fieldName} cannot be negative`,
+    };
+  }
+
+  return null;
+}
