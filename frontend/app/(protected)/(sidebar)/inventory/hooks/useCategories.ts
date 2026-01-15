@@ -1,4 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
+/**
+ * Custom hook for fetching and managing product categories
+ * Automatically fetches categories on mount and provides refetch capability
+ * @returns Object containing categories array, loading state, error state, and refetch function
+ */
+import { useCallback, useEffect, useState } from 'react';
 import { Category } from '../types';
 
 export function useCategories() {
@@ -19,7 +24,8 @@ export function useCategories() {
       const data = await response.json();
       setCategories(data);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
+      const errorMessage =
+        err instanceof Error ? err.message : 'An unknown error occurred';
       setError(errorMessage);
       console.error('Error fetching categories:', err);
     } finally {

@@ -1,3 +1,9 @@
+/**
+ * Custom hook for managing form state across all inventory forms
+ * Manages state for stock operations, category creation, and product creation forms
+ * Provides reset functions to clear form data after submission
+ * @returns Object containing form states, setters, and reset functions
+ */
 import { useState } from 'react';
 
 export function useInventoryForms() {

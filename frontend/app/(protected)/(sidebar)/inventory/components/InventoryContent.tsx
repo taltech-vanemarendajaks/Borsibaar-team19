@@ -1,10 +1,17 @@
 'use client';
 
+/**
+ * InventoryContent Component
+ *
+ * Main content container for the inventory page.
+ * Renders the header, search bar, error messages, and inventory table.
+ * All user interactions are handled via callback props.
+ */
+import { InventoryItem } from '../types';
 import { InventoryError } from './InventoryError';
 import { InventoryHeader } from './InventoryHeader';
 import { InventorySearch } from './InventorySearch';
 import { InventoryTable } from './InventoryTable';
-import { InventoryItem } from '../types';
 
 interface InventoryContentProps {
   inventory: InventoryItem[];
@@ -46,7 +53,10 @@ export function InventoryContent({
 
         {error && <InventoryError error={error} />}
 
-        <InventorySearch searchTerm={searchTerm} onSearchChange={onSearchChange} />
+        <InventorySearch
+          searchTerm={searchTerm}
+          onSearchChange={onSearchChange}
+        />
 
         <InventoryTable
           items={filteredInventory}

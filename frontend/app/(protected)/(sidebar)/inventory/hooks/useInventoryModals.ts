@@ -1,3 +1,8 @@
+/**
+ * Custom hook for managing all modal visibility states
+ * Provides state and handlers for opening/closing various inventory modals
+ * @returns Object containing modal states, setters, and open/close handlers
+ */
 import { useState } from 'react';
 import { InventoryItem } from '../types';
 

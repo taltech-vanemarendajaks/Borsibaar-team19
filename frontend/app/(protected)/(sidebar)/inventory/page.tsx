@@ -1,5 +1,22 @@
 'use client';
 
+/**
+ * Inventory Management Page
+ *
+ * Main page component for managing inventory, products, and categories.
+ * Uses the useInventoryPage hook to orchestrate all data fetching, state management,
+ * and user interactions. The component is split into:
+ * - InventoryContent: Main content area with header, search, and table
+ * - InventoryDialogs: All modal dialogs for various operations
+ *
+ * The page handles:
+ * - Displaying inventory items with stock levels
+ * - Searching and filtering inventory
+ * - Adding, removing, and adjusting stock
+ * - Creating products and categories
+ * - Viewing transaction history
+ * - Deleting products
+ */
 import { InventoryContent } from './components/InventoryContent';
 import { InventoryDialogs } from './components/InventoryDialogs';
 import { InventoryLoading } from './components/InventoryLoading';

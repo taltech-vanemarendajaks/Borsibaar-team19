@@ -1,3 +1,9 @@
+/**
+ * Main custom hook that combines all inventory-related hooks
+ * This is the primary hook used by the Inventory page component
+ * Orchestrates data fetching, state management, and action handlers
+ * @returns Comprehensive object containing all inventory page state and handlers
+ */
 import { useCategories } from './useCategories';
 import { useInventory } from './useInventory';
 import { useInventoryActions } from './useInventoryActions';

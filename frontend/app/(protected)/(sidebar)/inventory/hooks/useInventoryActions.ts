@@ -1,3 +1,10 @@
+/**
+ * Custom hook for handling all inventory-related API actions
+ * Manages create, update, and delete operations for products, categories, and stock
+ * Handles API calls, error handling, and callback execution after successful operations
+ * @param props - Configuration object containing refetch functions, form data, and callbacks
+ * @returns Object containing all action handler functions
+ */
 import { InventoryItem } from '../types';
 
 interface UseInventoryActionsProps {

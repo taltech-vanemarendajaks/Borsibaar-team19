@@ -1,4 +1,10 @@
-import { useState, useCallback } from 'react';
+/**
+ * Custom hook for fetching and managing transaction history
+ * Provides manual fetch capability (doesn't auto-fetch on mount)
+ * Used for displaying transaction history in modals
+ * @returns Object containing transactionHistory, loadingHistory, error, fetchTransactionHistory, and clearHistory
+ */
+import { useCallback, useState } from 'react';
 import { InventoryTransactionResponseDto } from '../types';
 
 export function useInventoryTransactions() {

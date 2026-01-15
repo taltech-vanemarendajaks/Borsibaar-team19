@@ -1,5 +1,21 @@
 'use client';
 
+/**
+ * InventoryDialogs Component
+ *
+ * Wrapper component that renders all inventory-related modal dialogs.
+ * Manages the display of 7 different dialogs:
+ * - CreateProductDialog: Create new product
+ * - DeleteProductDialog: Confirm product deletion
+ * - CreateCategoryDialog: Create new category
+ * - AddStockDialog: Add stock to inventory
+ * - RemoveStockDialog: Remove stock from inventory
+ * - AdjustStockDialog: Adjust stock quantity
+ * - TransactionHistoryDialog: View transaction history
+ *
+ * All dialogs are controlled via props from the parent component.
+ */
+import { Category, InventoryItem, InventoryTransactionResponseDto } from '../types';
 import { AddStockDialog } from './AddStockDialog';
 import { AdjustStockDialog } from './AdjustStockDialog';
 import { CreateCategoryDialog } from './CreateCategoryDialog';
@@ -7,8 +23,6 @@ import { CreateProductDialog } from './CreateProductDialog';
 import { DeleteProductDialog } from './DeleteProductDialog';
 import { RemoveStockDialog } from './RemoveStockDialog';
 import { TransactionHistoryDialog } from './TransactionHistoryDialog';
-import { Category } from '../types';
-import { InventoryItem, InventoryTransactionResponseDto } from '../types';
 
 interface InventoryDialogsProps {
   // Modal states

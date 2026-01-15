@@ -1,4 +1,9 @@
-import { useState, useEffect, useCallback } from 'react';
+/**
+ * Custom hook for fetching and managing inventory data
+ * Automatically fetches inventory on mount and provides refetch capability
+ * @returns Object containing inventory items, loading state, error state, and refetch function
+ */
+import { useCallback, useEffect, useState } from 'react';
 import { InventoryItem } from '../types';
 
 export function useInventory() {

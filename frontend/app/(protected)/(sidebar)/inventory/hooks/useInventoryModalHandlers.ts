@@ -1,3 +1,9 @@
+/**
+ * Custom hook for handling modal opening with additional logic
+ * Combines modal opening with form data initialization and transaction history fetching
+ * @param props - Configuration object containing modal openers, form setters, and fetch functions
+ * @returns Object containing handleOpenAdjustModal and handleOpenHistoryModal functions
+ */
 import { InventoryItem } from '../types';
 
 interface UseInventoryModalHandlersProps {
