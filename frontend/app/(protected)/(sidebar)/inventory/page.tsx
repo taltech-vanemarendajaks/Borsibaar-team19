@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { InventoryDialogs } from './components/InventoryDialogs';
 import { InventoryError } from './components/InventoryError';
 import { InventoryHeader } from './components/InventoryHeader';
@@ -13,8 +12,8 @@ import { useInventoryActions } from './hooks/useInventoryActions';
 import { useInventoryForms } from './hooks/useInventoryForms';
 import { useInventoryModalHandlers } from './hooks/useInventoryModalHandlers';
 import { useInventoryModals } from './hooks/useInventoryModals';
+import { useInventorySearch } from './hooks/useInventorySearch';
 import { useInventoryTransactions } from './hooks/useInventoryTransactions';
-import { filterInventory } from './utils';
 
 export const dynamic = 'force-dynamic';
 
@@ -26,7 +25,8 @@ export default function Inventory() {
     refetch: refetchInventory,
   } = useInventory();
   const { categories, refetch: refetchCategories } = useCategories();
-  const [searchTerm, setSearchTerm] = useState('');
+  const { searchTerm, setSearchTerm, filteredInventory } =
+    useInventorySearch(inventory);
   const {
     showAddModal,
     showRemoveModal,
@@ -108,8 +108,6 @@ export default function Inventory() {
       formData,
       fetchTransactionHistory,
     });
-
-  const filteredInventory = filterInventory(inventory, searchTerm);
 
   if (loading) {
     return <InventoryLoading />;
