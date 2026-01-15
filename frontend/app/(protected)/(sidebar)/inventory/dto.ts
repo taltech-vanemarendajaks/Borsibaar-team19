@@ -50,3 +50,21 @@ export interface CategoryResponseDto {
   name: string;
   dynamicPricing: boolean;
 }
+
+/**
+ * Inventory response DTO
+ * Matches InventoryResponseDto.java
+ */
+export interface InventoryResponseDto {
+  id: number;
+  organizationId: number;
+  productId: number;
+  productName: string;
+  quantity: number;
+  unitPrice: number;
+  description?: string | null;
+  basePrice: number;
+  minPrice: number;
+  maxPrice: number;
+  updatedAt: string;
+}
