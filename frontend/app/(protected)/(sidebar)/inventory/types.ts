@@ -3,46 +3,25 @@
  * Centralized type definitions for inventory-related data structures
  */
 
-/**
- * Transaction history response from the backend API
- */
-export interface InventoryTransactionResponseDto {
-  id: number;
-  inventoryId: number;
-  transactionType: string;
-  quantityChange: number;
-  quantityBefore: number;
-  quantityAfter: number;
-  referenceId?: string;
-  notes?: string;
-  createdBy: string;
-  createdByName?: string;
-  createdByEmail?: string;
-  createdAt: string;
-}
+// Re-export DTO types from shared DTO file
+export type {
+  CategoryResponseDto,
+  InventoryResponseDto,
+  InventoryTransactionResponseDto,
+  ProductResponseDto,
+} from './dto';
 
 /**
  * Inventory item with product information and current stock level
+ * Type alias for InventoryResponseDto - matches backend exactly
  */
-export interface InventoryItem {
-  id: number;
-  productId: number;
-  productName: string;
-  basePrice: string;
-  minPrice: string;
-  maxPrice: string;
-  quantity: number;
-  updatedAt: string;
-}
+export type InventoryItem = InventoryResponseDto;
 
 /**
  * Product category with dynamic pricing flag
+ * Type alias for CategoryResponseDto - matches backend exactly
  */
-export interface Category {
-  id: number;
-  name: string;
-  dynamicPricing: boolean;
-}
+export type Category = CategoryResponseDto;
 
 /**
  * Stock status styling and label information
