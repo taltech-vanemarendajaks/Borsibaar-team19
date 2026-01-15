@@ -4,6 +4,7 @@
  * @returns Object containing categories array, loading state, error state, and refetch function
  */
 import { useCallback, useEffect, useState } from 'react';
+import { CategoryResponseDto } from '../dto';
 import { Category } from '../types';
 
 export function useCategories() {
@@ -21,7 +22,7 @@ export function useCategories() {
         throw new Error('Failed to fetch categories');
       }
 
-      const data = await response.json();
+      const data: CategoryResponseDto[] = await response.json();
       setCategories(data);
     } catch (err) {
       const errorMessage =

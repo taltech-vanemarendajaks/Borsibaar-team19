@@ -4,8 +4,8 @@
  * @returns Object containing inventory items, loading state, error state, and refetch function
  */
 import { useCallback, useEffect, useState } from 'react';
-import { InventoryItem } from '../types';
 import { InventoryResponseDto } from '../dto';
+import { InventoryItem } from '../types';
 
 export function useInventory() {
   const [inventory, setInventory] = useState<InventoryItem[]>([]);
