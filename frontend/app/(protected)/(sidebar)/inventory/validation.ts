@@ -226,7 +226,9 @@ export function validateCategoryName(
   }
 
   const normalizedName = name.trim().toLowerCase();
-  if (existingNames.some(existing => existing.toLowerCase() === normalizedName)) {
+  if (
+    existingNames.some(existing => existing.toLowerCase() === normalizedName)
+  ) {
     return {
       field: 'name',
       message: 'A category with this name already exists',
@@ -234,4 +236,87 @@ export function validateCategoryName(
   }
 
   return null;
+}
+
+/**
+ * Validates a complete product form
+ * Combines all product validation checks into a single function
+ * @param productForm - Product form data to validate
+ * @param existingProductNames - Array of existing product names (for duplicate check)
+ * @returns ValidationResult with isValid flag and array of errors
+ */
+export function validateProductForm(
+  productForm: {
+    name: string;
+    categoryId: string;
+    currentPrice: string;
+    minPrice: string;
+    maxPrice: string;
+    initialQuantity: string;
+  },
+  existingProductNames: string[] = []
+): ValidationResult {
+  const errors: ValidationError[] = [];
+
+  // Validate name
+  const nameError = validateProductName(productForm.name, existingProductNames);
+  if (nameError) errors.push(nameError);
+
+  // Validate category
+  if (!productForm.categoryId || productForm.categoryId.trim().length === 0) {
+    errors.push({
+      field: 'categoryId',
+      message: 'Category is required',
+    });
+  }
+
+  // Validate prices
+  const minPriceError = validatePrice(productForm.minPrice, 'Min price');
+  if (minPriceError) errors.push(minPriceError);
+
+  const maxPriceError = validatePrice(productForm.maxPrice, 'Max price');
+  if (maxPriceError) errors.push(maxPriceError);
+
+  const currentPriceError = validatePrice(
+    productForm.currentPrice,
+    'Current price'
+  );
+  if (currentPriceError) errors.push(currentPriceError);
+
+  // Validate price range (only if both are valid numbers)
+  if (!minPriceError && !maxPriceError) {
+    const rangeError = validatePriceRange(
+      productForm.minPrice,
+      productForm.maxPrice
+    );
+    if (rangeError) errors.push(rangeError);
+  }
+
+  // Validate current price is in range (only if all prices are valid)
+  if (!minPriceError && !maxPriceError && !currentPriceError) {
+    const rangeError = validateCurrentPriceInRange(
+      productForm.currentPrice,
+      productForm.minPrice,
+      productForm.maxPrice
+    );
+    if (rangeError) errors.push(rangeError);
+  }
+
+  // Validate initial quantity (optional field, but if provided must be valid)
+  if (
+    productForm.initialQuantity &&
+    productForm.initialQuantity.trim().length > 0
+  ) {
+    const qtyError = validateQuantity(
+      productForm.initialQuantity,
+      'Initial quantity',
+      true
+    );
+    if (qtyError) errors.push(qtyError);
+  }
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+  };
 }
