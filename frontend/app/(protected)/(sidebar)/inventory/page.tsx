@@ -16,6 +16,7 @@ import { TransactionHistoryDialog } from './components/TransactionHistoryDialog'
 import { useCategories } from './hooks/useCategories';
 import { useInventory } from './hooks/useInventory';
 import { useInventoryActions } from './hooks/useInventoryActions';
+import { useInventoryModals } from './hooks/useInventoryModals';
 import { useInventoryTransactions } from './hooks/useInventoryTransactions';
 import { InventoryItem } from './types';
 import { filterInventory } from './utils';
@@ -31,13 +32,30 @@ export default function Inventory() {
   } = useInventory();
   const { categories, refetch: refetchCategories } = useCategories();
   const [searchTerm, setSearchTerm] = useState('');
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [showRemoveModal, setShowRemoveModal] = useState(false);
-  const [showAdjustModal, setShowAdjustModal] = useState(false);
-  const [showHistoryModal, setShowHistoryModal] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState<InventoryItem | null>(
-    null
-  );
+  const {
+    showAddModal,
+    showRemoveModal,
+    showAdjustModal,
+    showHistoryModal,
+    showCreateProductModal,
+    showDeleteProductModal,
+    showCreateCategoryModal,
+    selectedProduct,
+    setShowAddModal,
+    setShowRemoveModal,
+    setShowAdjustModal,
+    setShowHistoryModal,
+    setShowCreateProductModal,
+    setShowDeleteProductModal,
+    setShowCreateCategoryModal,
+    setSelectedProduct,
+    openAddModal,
+    openDeleteModal,
+    openRemoveModal,
+    openAdjustModal,
+    openHistoryModal,
+    closeModals,
+  } = useInventoryModals();
   const {
     transactionHistory,
     loadingHistory,
@@ -49,9 +67,6 @@ export default function Inventory() {
     notes: '',
     referenceId: '',
   });
-  const [showCreateProductModal, setShowCreateProductModal] = useState(false);
-  const [showDeleteProductModal, setShowDeleteProductModal] = useState(false);
-  const [showCreateCategoryModal, setShowCreateCategoryModal] = useState(false);
   const [categoryForm, setCategoryForm] = useState({
     name: '',
     dynamicPricing: true,
@@ -67,18 +82,6 @@ export default function Inventory() {
     notes: '',
   });
 
-  const closeModals = () => {
-    setShowAddModal(false);
-    setShowRemoveModal(false);
-    setShowAdjustModal(false);
-    setShowHistoryModal(false);
-    setShowCreateCategoryModal(false);
-    setShowDeleteProductModal(false);
-    setSelectedProduct(null);
-    setFormData({ quantity: '', notes: '', referenceId: '' });
-    clearHistory();
-  };
-
   const {
     handleCreateProduct,
     handleAddStock,
@@ -93,7 +96,10 @@ export default function Inventory() {
     formData,
     productForm,
     categoryForm,
-    onCloseModals: closeModals,
+    onCloseModals: () => {
+      closeModals(clearHistory);
+      setFormData({ quantity: '', notes: '', referenceId: '' });
+    },
     onProductFormReset: () => {
       setShowCreateProductModal(false);
       setProductForm({
@@ -119,30 +125,13 @@ export default function Inventory() {
     },
   });
 
-  const openAddModal = (item: InventoryItem) => {
-    setSelectedProduct(item);
-    setShowAddModal(true);
-  };
-
-  const openDeleteModal = (item: InventoryItem) => {
-    setSelectedProduct(item);
-    setShowDeleteProductModal(true);
-  };
-
-  const openRemoveModal = (item: InventoryItem) => {
-    setSelectedProduct(item);
-    setShowRemoveModal(true);
-  };
-
-  const openAdjustModal = (item: InventoryItem) => {
-    setSelectedProduct(item);
+  const handleOpenAdjustModal = (item: InventoryItem) => {
     setFormData({ ...formData, quantity: item.quantity.toString() });
-    setShowAdjustModal(true);
+    openAdjustModal(item);
   };
 
-  const openHistoryModal = async (item: InventoryItem) => {
-    setSelectedProduct(item);
-    setShowHistoryModal(true);
+  const handleOpenHistoryModal = async (item: InventoryItem) => {
+    openHistoryModal(item);
     await fetchTransactionHistory(item.productId);
   };
 
@@ -172,8 +161,8 @@ export default function Inventory() {
           items={filteredInventory}
           onAddStock={openAddModal}
           onRemoveStock={openRemoveModal}
-          onAdjustStock={openAdjustModal}
-          onViewHistory={openHistoryModal}
+          onAdjustStock={handleOpenAdjustModal}
+          onViewHistory={handleOpenHistoryModal}
           onDeleteProduct={openDeleteModal}
         />
       </div>
