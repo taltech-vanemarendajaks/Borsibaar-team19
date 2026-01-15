@@ -99,3 +99,24 @@ export interface AdjustStockRequestDto {
   newQuantity: number;
   notes?: string | null;
 }
+
+/**
+ * Inventory transaction response DTO
+ * Matches InventoryTransactionResponseDto.java
+ */
+export interface InventoryTransactionResponseDto {
+  id: number;
+  inventoryId: number;
+  transactionType: string;
+  quantityChange: number;
+  quantityBefore: number;
+  quantityAfter: number;
+  priceBefore?: number | null;
+  priceAfter?: number | null;
+  referenceId?: string | null;
+  notes?: string | null;
+  createdBy: string;
+  createdByName?: string | null;
+  createdByEmail?: string | null;
+  createdAt: string;
+}
