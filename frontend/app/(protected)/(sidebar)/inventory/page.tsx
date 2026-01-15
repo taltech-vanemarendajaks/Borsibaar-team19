@@ -1,13 +1,14 @@
 'use client';
 
-import { AlertCircle } from 'lucide-react';
 import { useState } from 'react';
 import { AddStockDialog } from './components/AddStockDialog';
 import { AdjustStockDialog } from './components/AdjustStockDialog';
 import { CreateCategoryDialog } from './components/CreateCategoryDialog';
 import { CreateProductDialog } from './components/CreateProductDialog';
 import { DeleteProductDialog } from './components/DeleteProductDialog';
+import { InventoryError } from './components/InventoryError';
 import { InventoryHeader } from './components/InventoryHeader';
+import { InventoryLoading } from './components/InventoryLoading';
 import { InventorySearch } from './components/InventorySearch';
 import { InventoryTable } from './components/InventoryTable';
 import { RemoveStockDialog } from './components/RemoveStockDialog';
@@ -318,14 +319,7 @@ export default function Inventory() {
   const filteredInventory = filterInventory(inventory, searchTerm);
 
   if (loading) {
-    return (
-      <div className="min-h-screen w-full bg-background p-4 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading inventory...</p>
-        </div>
-      </div>
-    );
+    return <InventoryLoading />;
   }
 
   return (
@@ -337,12 +331,7 @@ export default function Inventory() {
           onCreateProduct={() => setShowCreateProductModal(true)}
         />
 
-        {error && (
-          <div className="mb-4 p-4 bg-red-950 border border-red-800 rounded-lg flex items-center gap-2 text-red-50">
-            <AlertCircle className="w-5 h-5" />
-            <span>{error}</span>
-          </div>
-        )}
+        {error && <InventoryError error={error} />}
 
         <InventorySearch
           searchTerm={searchTerm}
