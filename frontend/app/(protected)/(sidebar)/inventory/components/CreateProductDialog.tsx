@@ -230,12 +230,25 @@ export function CreateProductDialog({
               min="0"
               value={productForm.initialQuantity}
               onChange={e => onFormChange('initialQuantity', e.target.value)}
-              className="w-full px-3 py-2 border border-gray-700 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:border-transparent ${
+                getFieldError('initialquantity') ||
+                getFieldError('Initial quantity')
+                  ? 'border-red-500 focus:ring-red-500'
+                  : 'border-gray-700 focus:ring-blue-500'
+              }`}
               placeholder="0"
             />
-            <p className="text-xs text-gray-500 mt-1">
-              Leave empty or 0 for no initial stock
-            </p>
+            {getFieldError('initialquantity') ||
+            getFieldError('Initial quantity') ? (
+              <p className="text-sm text-red-500 mt-1">
+                {getFieldError('initialquantity')?.message ||
+                  getFieldError('Initial quantity')?.message}
+              </p>
+            ) : (
+              <p className="text-xs text-gray-500 mt-1">
+                Leave empty or 0 for no initial stock
+              </p>
+            )}
           </div>
           <div>
             <label className="block text-sm font-medium text-gray-300 mb-1">
