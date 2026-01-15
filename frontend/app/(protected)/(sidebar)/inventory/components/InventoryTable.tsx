@@ -119,22 +119,22 @@ export function InventoryTable({
                 </td>
                 <td className="py-3 px-4 text-center">
                   <span className="text-lg font-semibold text-gray-300">
-                    {parseFloat(item.basePrice).toFixed(2)}€
+                    {item.basePrice.toFixed(2)}€
                   </span>
                 </td>
                 <td className="py-3 px-4 text-center">
                   <span className="text-lg text-gray-300">
-                    {isNaN(parseFloat(item.minPrice))
+                    {item.minPrice == null || isNaN(item.minPrice)
                       ? '--'
-                      : parseFloat(item.minPrice).toFixed(2)}
+                      : item.minPrice.toFixed(2)}
                     €
                   </span>
                 </td>
                 <td className="py-3 px-4 text-center">
                   <span className="text-lg text-gray-300">
-                    {isNaN(parseFloat(item.maxPrice))
+                    {item.maxPrice == null || isNaN(item.maxPrice)
                       ? '--'
-                      : parseFloat(item.maxPrice).toFixed(2)}
+                      : item.maxPrice.toFixed(2)}
                     €
                   </span>
                 </td>
