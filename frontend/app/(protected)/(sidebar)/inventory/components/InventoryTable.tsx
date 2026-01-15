@@ -140,9 +140,7 @@ export function InventoryTable({
                 </td>
                 <td className="py-3 px-4 text-center">
                   <span className="text-lg font-semibold text-gray-300">
-                    {typeof item.quantity === 'number'
-                      ? item.quantity.toFixed(2)
-                      : parseFloat(String(item.quantity)).toFixed(2)}
+                    {item.quantity.toFixed(2)}
                   </span>
                 </td>
                 <td className="py-3 px-4 text-center">
