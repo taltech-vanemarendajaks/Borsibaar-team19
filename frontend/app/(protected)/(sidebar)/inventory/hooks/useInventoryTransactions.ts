@@ -6,6 +6,7 @@
  */
 import { useCallback, useState } from 'react';
 import { InventoryTransactionResponseDto } from '../types';
+import type { InventoryTransactionResponseDto as InventoryTransactionResponseDtoType } from '../dto';
 
 export function useInventoryTransactions() {
   const [transactionHistory, setTransactionHistory] = useState<
@@ -27,7 +28,7 @@ export function useInventoryTransactions() {
 
       if (!response.ok) throw new Error('Failed to fetch history');
 
-      const data = await response.json();
+      const data: InventoryTransactionResponseDtoType[] = await response.json();
       setTransactionHistory(data);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
