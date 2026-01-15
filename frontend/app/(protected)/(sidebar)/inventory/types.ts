@@ -3,6 +3,9 @@
  * Centralized type definitions for inventory-related data structures
  */
 
+// Import DTO types for use in type aliases
+import type { CategoryResponseDto, InventoryResponseDto } from './dto';
+
 // Re-export DTO types from shared DTO file
 export type {
   CategoryResponseDto,
