@@ -31,3 +31,22 @@ export interface ProductResponseDto {
   categoryId: number;
   categoryName: string;
 }
+
+/**
+ * Category creation request DTO
+ * Matches CategoryRequestDto.java
+ */
+export interface CategoryRequestDto {
+  name: string;
+  dynamicPricing?: boolean | null;
+}
+
+/**
+ * Category response DTO
+ * Matches CategoryResponseDto.java
+ */
+export interface CategoryResponseDto {
+  id: number;
+  name: string;
+  dynamicPricing: boolean;
+}
