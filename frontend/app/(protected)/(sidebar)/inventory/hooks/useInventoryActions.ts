@@ -5,6 +5,7 @@
  * @param props - Configuration object containing refetch functions, form data, and callbacks
  * @returns Object containing all action handler functions
  */
+import type { ProductRequestDto, ProductResponseDto } from '../dto';
 import { InventoryItem } from '../types';
 
 interface UseInventoryActionsProps {
@@ -50,17 +51,19 @@ export function useInventoryActions({
 }: UseInventoryActionsProps) {
   const handleCreateProduct = async () => {
     try {
+      const requestBody: ProductRequestDto = {
+        name: productForm.name,
+        description: productForm.description || null,
+        categoryId: parseInt(productForm.categoryId),
+        currentPrice: parseFloat(productForm.currentPrice),
+        minPrice: parseFloat(productForm.minPrice),
+        maxPrice: parseFloat(productForm.maxPrice),
+      };
+
       const productResponse = await fetch('/api/backend/product', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: productForm.name,
-          description: productForm.description,
-          categoryId: parseInt(productForm.categoryId),
-          currentPrice: parseFloat(productForm.currentPrice),
-          minPrice: parseFloat(productForm.minPrice),
-          maxPrice: parseFloat(productForm.maxPrice),
-        }),
+        body: JSON.stringify(requestBody),
       });
 
       if (!productResponse.ok) {
@@ -68,7 +71,7 @@ export function useInventoryActions({
         throw new Error(error.message || 'Failed to create product');
       }
 
-      const newProduct = await productResponse.json();
+      const newProduct: ProductResponseDto = await productResponse.json();
 
       if (
         productForm.initialQuantity &&
