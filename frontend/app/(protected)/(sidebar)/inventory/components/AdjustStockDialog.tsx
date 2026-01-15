@@ -1,3 +1,12 @@
+/**
+ * AdjustStockDialog Component
+ *
+ * Dialog for adjusting stock quantity to a specific value with form validation.
+ * Validates:
+ * - Quantity (required, must be a valid non-negative number, zero is allowed)
+ *
+ * Displays validation errors in real-time and disables submit button when validation fails.
+ */
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -38,7 +47,11 @@ export function AdjustStockDialog({
     errors: [],
   });
 
-  // Validate quantity on change (allow zero for adjust operation)
+  /**
+   * Validate quantity whenever it changes
+   * Allows zero for adjust operation (unlike add/remove operations)
+   * Runs validation in real-time as user types
+   */
   useEffect(() => {
     const errors: Array<{ field: string; message: string }> = [];
     const qtyError = validateQuantity(quantity, 'quantity', true);
@@ -49,7 +62,10 @@ export function AdjustStockDialog({
     });
   }, [quantity]);
 
-  // Helper function to get error for quantity field
+  /**
+   * Helper function to get validation error for quantity field
+   * @returns ValidationError or undefined
+   */
   const getQuantityError = () => {
     return validationResult.errors.find(error => error.field === 'quantity');
   };

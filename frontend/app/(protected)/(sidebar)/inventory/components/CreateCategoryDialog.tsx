@@ -1,5 +1,14 @@
 'use client';
 
+/**
+ * CreateCategoryDialog Component
+ *
+ * Dialog for creating a new category with form validation.
+ * Validates:
+ * - Category name (required, min 2 characters, no duplicates)
+ *
+ * Displays validation errors in real-time and disables submit button when validation fails.
+ */
 import { Button } from '@/components/ui/button';
 import {
   Dialog,

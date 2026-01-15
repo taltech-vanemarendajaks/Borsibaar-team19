@@ -1,3 +1,12 @@
+/**
+ * RemoveStockDialog Component
+ *
+ * Dialog for removing stock from an existing product with form validation.
+ * Validates:
+ * - Quantity (required, must be a valid positive number, cannot be zero)
+ *
+ * Displays validation errors in real-time and disables submit button when validation fails.
+ */
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -42,13 +51,19 @@ export function RemoveStockDialog({
     errors: [],
   });
 
-  // Validate quantity on change
+  /**
+   * Validate quantity whenever it changes
+   * Runs validation in real-time as user types
+   */
   useEffect(() => {
     const result = validateStockQuantity(quantity);
     setValidationResult(result);
   }, [quantity]);
 
-  // Helper function to get error for quantity field
+  /**
+   * Helper function to get validation error for quantity field
+   * @returns ValidationError or undefined
+   */
   const getQuantityError = () => {
     return validationResult.errors.find(error => error.field === 'quantity');
   };

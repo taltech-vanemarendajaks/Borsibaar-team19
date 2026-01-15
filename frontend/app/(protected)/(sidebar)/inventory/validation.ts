@@ -240,7 +240,15 @@ export function validateCategoryName(
 
 /**
  * Validates a complete product form
- * Combines all product validation checks into a single function
+ * Combines all product validation checks into a single function.
+ * Performs comprehensive validation including:
+ * - Product name (required, min length, no duplicates)
+ * - Category selection (required)
+ * - All price fields (required, non-negative, valid numbers)
+ * - Price range validation (min <= max)
+ * - Current price within min-max range
+ * - Initial quantity (optional, but validated if provided)
+ *
  * @param productForm - Product form data to validate
  * @param existingProductNames - Array of existing product names (for duplicate check)
  * @returns ValidationResult with isValid flag and array of errors
@@ -323,7 +331,9 @@ export function validateProductForm(
 
 /**
  * Validates a complete category form
- * Combines all category validation checks into a single function
+ * Combines all category validation checks into a single function.
+ * Validates category name (required, min length, no duplicates).
+ *
  * @param categoryForm - Category form data to validate
  * @param existingCategoryNames - Array of existing category names (for duplicate check)
  * @returns ValidationResult with isValid flag and array of errors
@@ -348,7 +358,10 @@ export function validateCategoryForm(
 
 /**
  * Validates stock quantity for add/remove/adjust operations
- * Wrapper around validateQuantity with stock-specific defaults
+ * Wrapper around validateQuantity with stock-specific defaults.
+ * Validates that quantity is required, a valid number, non-negative, and greater than zero.
+ * Use this for add/remove operations where zero is not allowed.
+ *
  * @param quantity - Quantity string to validate
  * @returns ValidationResult with isValid flag and array of errors
  */

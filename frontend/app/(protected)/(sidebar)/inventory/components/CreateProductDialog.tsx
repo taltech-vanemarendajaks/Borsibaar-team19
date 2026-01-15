@@ -19,6 +19,20 @@ import { useEffect, useMemo, useState } from 'react';
 import { Category, InventoryItem } from '../types';
 import { ValidationResult, validateProductForm } from '../validation';
 
+/**
+ * CreateProductDialog Component
+ *
+ * Dialog for creating a new product with comprehensive form validation.
+ * Validates:
+ * - Product name (required, min length, no duplicates)
+ * - Category selection (required)
+ * - Prices (required, non-negative, valid numbers)
+ * - Price range (min <= max)
+ * - Current price within min-max range
+ * - Initial quantity (optional, but must be valid if provided)
+ *
+ * Displays validation errors in real-time and disables submit button when validation fails.
+ */
 interface ProductForm {
   name: string;
   description: string;
@@ -54,20 +68,31 @@ export function CreateProductDialog({
     errors: [],
   });
 
-  // Get existing product names for duplicate checking (memoized to prevent infinite loops)
+  /**
+   * Get existing product names for duplicate checking
+   * Memoized to prevent infinite loops in useEffect dependencies
+   */
   const existingProductNames = useMemo(
     () => inventory.map(item => item.productName),
     [inventory]
   );
 
-  // Validate form on change
+  /**
+   * Validate form whenever form data or existing product names change
+   * Runs validation in real-time as user types
+   */
   useEffect(() => {
     const result = validateProductForm(productForm, existingProductNames);
     setValidationResult(result);
   }, [productForm, existingProductNames]);
 
-  // Helper function to get error for a specific field
-  // Checks multiple possible field name variations (e.g., 'currentprice' and 'currentPrice')
+  /**
+   * Helper function to get validation error for a specific field
+   * Checks multiple possible field name variations (e.g., 'currentprice' and 'currentPrice')
+   * to handle different validation function naming conventions
+   * @param fieldName - Field name to get error for
+   * @returns ValidationError or undefined
+   */
   const getFieldError = (fieldName: string) => {
     return (
       validationResult.errors.find(error => error.field === fieldName) ||
