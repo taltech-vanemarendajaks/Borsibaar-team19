@@ -320,3 +320,46 @@ export function validateProductForm(
     errors,
   };
 }
+
+/**
+ * Validates a complete category form
+ * Combines all category validation checks into a single function
+ * @param categoryForm - Category form data to validate
+ * @param existingCategoryNames - Array of existing category names (for duplicate check)
+ * @returns ValidationResult with isValid flag and array of errors
+ */
+export function validateCategoryForm(
+  categoryForm: { name: string },
+  existingCategoryNames: string[] = []
+): ValidationResult {
+  const errors: ValidationError[] = [];
+
+  const nameError = validateCategoryName(
+    categoryForm.name,
+    existingCategoryNames
+  );
+  if (nameError) errors.push(nameError);
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+  };
+}
+
+/**
+ * Validates stock quantity for add/remove/adjust operations
+ * Wrapper around validateQuantity with stock-specific defaults
+ * @param quantity - Quantity string to validate
+ * @returns ValidationResult with isValid flag and array of errors
+ */
+export function validateStockQuantity(quantity: string): ValidationResult {
+  const errors: ValidationError[] = [];
+
+  const qtyError = validateQuantity(quantity, 'quantity', false);
+  if (qtyError) errors.push(qtyError);
+
+  return {
+    isValid: errors.length === 0,
+    errors,
+  };
+}
