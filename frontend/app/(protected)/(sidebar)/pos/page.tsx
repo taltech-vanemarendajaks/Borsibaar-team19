@@ -7,6 +7,7 @@ import { StationManagementHeader } from "./StationManagementHeader";
 import { StationCard } from "./StationCard";
 import { CurrentUser, BarStation, User } from "./types";
 import { fetchCurrentUser } from "@/lib/api/account";
+import { fetchStationsForUser } from "@/lib/api/stations";
 
 export const dynamic = "force-dynamic";
 
@@ -20,38 +21,6 @@ export default function POSManagement() {
   const [userFetchError, setUserFetchError] = useState<string | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingStationId, setEditingStationId] = useState<number | null>(null);
-
-  const fetchStations = useCallback(
-    async (isAdmin: boolean) => {
-      try {
-        const url = isAdmin
-          ? "/api/backend/bar-stations"
-          : "/api/backend/bar-stations/user";
-
-        const response = await fetch(url, { cache: "no-store" });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch stations");
-        }
-
-        const data = await response.json();
-        setStations(data);
-
-        // If non-admin with single station, auto-redirect
-        if (!isAdmin && data.length === 1) {
-          router.push(`/pos/${data[0].id}`);
-          return;
-        }
-
-        setError(null);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Unknown error");
-      } finally {
-        setLoading(false);
-      }
-    },
-    [router],
-  );
 
   const fetchAllUsers = useCallback(async () => {
     try {
@@ -73,22 +42,46 @@ export default function POSManagement() {
     }
   }, []);
 
+  const refreshStations = useCallback(async (isAdmin: boolean) => {
+    const data = await fetchStationsForUser(isAdmin);
+    setStations(data);
+    return data;
+  }, []);
+
   useEffect(() => {
     const init = async () => {
       const user = await fetchCurrentUser();
       setCurrentUser(user);
-      if (user) {
-        const isAdmin = user.role === "ADMIN";
-        await fetchStations(isAdmin);
+
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
+      const isAdmin = user.role === "ADMIN";
+
+      try {
+        const data = await refreshStations(isAdmin);
+        setStations(data);
+        setError(null);
+
+        if (!isAdmin && data.length === 1) {
+          router.push(`/pos/${data[0].id}`);
+          return;
+        }
 
         if (isAdmin) {
           await fetchAllUsers();
         }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Unknown error");
+      } finally {
+        setLoading(false);
       }
     };
 
     init();
-  }, [fetchStations, fetchAllUsers]);
+  }, [router, fetchAllUsers, refreshStations]);
 
   const handleCreateStation = async (data: {
     name: string;
@@ -113,7 +106,7 @@ export default function POSManagement() {
       throw new Error(errorText || "Failed to create station");
     }
 
-    await fetchStations(true);
+    await refreshStations(true);
   };
 
   const handleUpdateStation = async (
@@ -142,7 +135,7 @@ export default function POSManagement() {
       throw new Error(errorText || "Failed to update station");
     }
 
-    await fetchStations(true);
+    await refreshStations(true);
   };
 
   const handleDeleteStation = async (stationId: number) => {
@@ -159,7 +152,7 @@ export default function POSManagement() {
         throw new Error("Failed to delete station");
       }
 
-      await fetchStations(true);
+      await refreshStations(true);
     } catch (err) {
       alert(
         `Error deleting station: ${
