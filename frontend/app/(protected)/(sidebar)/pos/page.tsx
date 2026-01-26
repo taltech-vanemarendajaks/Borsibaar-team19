@@ -8,6 +8,7 @@ import { StationCard } from "./StationCard";
 import { CurrentUser, BarStation, User } from "./types";
 import { fetchCurrentUser } from "@/lib/api/account";
 import { fetchStationsForUser } from "@/lib/api/stations";
+import { fetchAllUsers } from "@/lib/api/users";
 
 export const dynamic = "force-dynamic";
 
@@ -21,26 +22,6 @@ export default function POSManagement() {
   const [userFetchError, setUserFetchError] = useState<string | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingStationId, setEditingStationId] = useState<number | null>(null);
-
-  const fetchAllUsers = useCallback(async () => {
-    try {
-      const response = await fetch("/api/backend/users", { cache: "no-store" });
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || "Failed to fetch users");
-      }
-
-      const data = await response.json();
-      setAllUsers(data);
-      setUserFetchError(null);
-    } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Failed to fetch users";
-      console.error("Error fetching users:", err);
-      setAllUsers([]);
-      setUserFetchError(message);
-    }
-  }, []);
 
   const refreshStations = useCallback(async (isAdmin: boolean) => {
     const data = await fetchStationsForUser(isAdmin);
@@ -71,7 +52,17 @@ export default function POSManagement() {
         }
 
         if (isAdmin) {
-          await fetchAllUsers();
+          try {
+            const users = await fetchAllUsers();
+            setAllUsers(users);
+            setUserFetchError(null);
+          } catch (err) {
+            const message =
+              err instanceof Error ? err.message : "Failed to fetch users";
+            console.error("Error fetching users:", err);
+            setAllUsers([]);
+            setUserFetchError(message);
+          }
         }
       } catch (err) {
         setError(err instanceof Error ? err.message : "Unknown error");
@@ -81,7 +72,7 @@ export default function POSManagement() {
     };
 
     init();
-  }, [router, fetchAllUsers, refreshStations]);
+  }, [router, refreshStations]);
 
   const handleCreateStation = async (data: {
     name: string;
