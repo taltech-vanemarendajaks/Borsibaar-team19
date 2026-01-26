@@ -3,7 +3,7 @@
 ## Team Members
 
 - Raigo Hõim - raigoh
-- [Lisa oma nimi] - [GitHub username]
+- Karl-Kristjan Küppas - karlkuppas
 - [Lisa oma nimi] - [GitHub username]
 - [Lisa oma nimi] - [GitHub username]
 - [Lisa oma nimi] - [GitHub username]
@@ -38,6 +38,3 @@ Meie tiim kasutab **feature branch** strateegiat:
    - Review'is kontrollitakse koodi kvaliteeti, loogikat ja stiili
    - Kui on vaja muudatusi, märgitakse PR "Request changes" staatusega
    - Pärast muudatuste tegemist saab PR uuesti review'ks
-
-
-
