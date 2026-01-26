@@ -7,7 +7,12 @@ import { StationManagementHeader } from "./StationManagementHeader";
 import { StationCard } from "./StationCard";
 import { CurrentUser, BarStation, User } from "./types";
 import { fetchCurrentUser } from "@/lib/api/account";
-import { fetchStationsForUser } from "@/lib/api/stations";
+import {
+  createStation,
+  deleteStation,
+  fetchStationsForUser,
+  updateStation,
+} from "@/lib/api/stations";
 import { fetchAllUsers } from "@/lib/api/users";
 
 export const dynamic = "force-dynamic";
@@ -86,17 +91,7 @@ export default function POSManagement() {
       userIds: data.userIds,
     };
 
-    const response = await fetch("/api/backend/bar-stations", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(errorText || "Failed to create station");
-    }
-
+    await createStation(payload);
     await refreshStations(true);
   };
 
@@ -115,17 +110,7 @@ export default function POSManagement() {
       userIds: data.userIds,
     };
 
-    const response = await fetch(`/api/backend/bar-stations/${stationId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(errorText || "Failed to update station");
-    }
-
+    await updateStation(stationId, payload);
     await refreshStations(true);
   };
 
@@ -135,14 +120,7 @@ export default function POSManagement() {
     }
 
     try {
-      const response = await fetch(`/api/backend/bar-stations/${stationId}`, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to delete station");
-      }
-
+      await deleteStation(stationId);
       await refreshStations(true);
     } catch (err) {
       alert(

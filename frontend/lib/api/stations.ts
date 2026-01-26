@@ -15,3 +15,59 @@ export async function fetchStationsForUser(
 
   return response.json();
 }
+
+export async function createStation(payload: {
+  name: string;
+  description: string;
+  isActive: boolean;
+  userIds: string[];
+}): Promise<void> {
+  const response = await fetch("/api/backend/bar-stations", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(errorText || "Failed to create station");
+  }
+}
+
+export async function updateStation(
+  stationId: number,
+  data: {
+    name: string;
+    description: string;
+    userIds: string[];
+  },
+): Promise<void> {
+  const payload = {
+    name: data.name,
+    description: data.description,
+    isActive: true,
+    userIds: data.userIds,
+  };
+
+  const response = await fetch(`/api/backend/bar-stations/${stationId}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(errorText || "Failed to update station");
+  }
+}
+
+export async function deleteStation(stationId: number): Promise<void> {
+  const response = await fetch(`/api/backend/bar-stations/${stationId}`, {
+    method: "DELETE",
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(errorText || "Failed to delete station");
+  }
+}
