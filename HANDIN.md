@@ -3,11 +3,13 @@
 ## Part 1: Repository setup
 
 ### Step 1: Fork the repository
+
 - Forkisin algse repo oma GitHubi alla: `https://github.com/raigoh/vanemarendaja-borsibaar`
 - Meie tiimi “main” repo (team repository) on: `https://github.com/taltech-vanemarendajaks/Borsibaar-team19`
 - Originaal (course) repo: `https://github.com/taltech-coding/vanemarendaja-borsibaar`
 
 ### Step 2: Clone the repository
+
 - Kloonsin tiimi repo lokaalselt (kõik edasised Git tegevused tegin käsurealt).
 - Remotes:
   - `origin` → `https://github.com/taltech-vanemarendajaks/Borsibaar-team19.git`
@@ -15,6 +17,7 @@
   - `taltech` → `https://github.com/taltech-coding/vanemarendaja-borsibaar.git`
 
 ### Step 3: Initial commit (TEAM.md)
+
 - Lõin uue branchi: `docs/add-team-md`
 - Lõin faili: `TEAM.md`
 - Commitisin ja pushisin branchi `origin`-isse:
@@ -28,11 +31,13 @@
 ## Part 2: Branching and parallel development
 
 ### Step 4: Define features
+
 Valisin iseseisva feature’i, mida saan paralleelselt arendada eraldi harus.
 
 ### Step 5–6: Create feature branches & work on features (tõendid)
 
 #### Feature 1 (minu tehtud): Inventory frontend refactor / type improvements
+
 - Tegija: `raigoh`
 - Branch: `refactor/inventory-management-improvements`
 - Remote branch: `origin/refactor/inventory-management-improvements`
@@ -49,6 +54,7 @@ Valisin iseseisva feature’i, mida saan paralleelselt arendada eraldi harus.
   - `94b0184` — `refactor(inventory): remove unnecessary typeof check for quantity in InventoryTable`
 
 #### Feature 2: TEAM.md lisamine (docs)
+
 - Tegija: `raigoh`
 - Branch: `docs/add-team-md`
 - Remote branch: `origin/docs/add-team-md`
@@ -61,6 +67,7 @@ Valisin iseseisva feature’i, mida saan paralleelselt arendada eraldi harus.
 ## Part 3: Creating and resolving conflicts
 
 ### Step 7: Intentionally create a conflict
+
 Tekitasin merge konflikti üksi, kasutades 2 juba olemasolevat branchi (`docs/add-team-md` ja `refactor/inventory-management-improvements`), kus muutsin `README.md` sama rida (“Project Overview” kirjelduses) erinevalt.
 
 - Branch A: `docs/add-team-md`
@@ -69,10 +76,12 @@ Tekitasin merge konflikti üksi, kasutades 2 juba olemasolevat branchi (`docs/ad
   - Commit: `1582c9d` — `docs(readme): updated overview text`
 
 GitHubis avasin 2 PR-i `main` branchi vastu:
+
 - PR #54: `docs/add-team-md` → `main` (muudatus: "Bärsibaar")
 - PR #55: `refactor/inventory-management-improvements` → `main` (muudatus: "Borsibaar")
 
 ### Step 8: Resolve the conflict
+
 Merge’isin esimesena PR #55 `main`-i (merge commit), mis sisaldab õiget teksti **"Borsibaar"**. PR #54 jäi konflikti ("has conflicts"). Lahendasin PR #54 konflikti lokaalselt käsurealt, et see ühilduks `main` branchiga (mis nüüd sisaldab PR #55 muudatusi).
 
 - Eesmärk: lõpptulemus `main` branchis on **"Borsibaar"** (PR #55 muudatus).
@@ -86,6 +95,7 @@ Merge’isin esimesena PR #55 `main`-i (merge commit), mis sisaldab õiget tekst
   - `git push origin docs/add-team-md`
 
 Tõendid (täidan pärast approve/merge’i):
+
 - Konflikti lahenduse commit: `f5acb59` — `resolve: merge conflict in README (keep Borsibaar)`
 - Merge commit `main` branchis (PR #55): `1126e65` — `Merge pull request #55 from taltech-vanemarendajaks/refactor/inventory-management-improvements`
 - PR #54 reviewer: `VuntsJaHabe` (approval)
@@ -94,17 +104,21 @@ Tõendid (täidan pärast approve/merge’i):
 ## Part 4: Pull requests and code reviews (in GitHub GUI)
 
 ### Step 9: Open pull requests
+
 Avasin Pull Requesti GitHubis: `docs/add-team-md` → `main`.
 
 #### PR #52: TEAM.md lisamine
+
 - Branch: `docs/add-team-md` → `main`
 - Avasin PR-i GitHubis pärast seda, kui pushisin `docs/add-team-md` branchi.
 - Muutus: uus fail `TEAM.md` (+43 rida) — tiimi nimi, liikmed, workflow kirjeldus.
 
 ### Step 10: Review pull requests
+
 Tiimi liige tegi review'i ja jättis kommentaari.
 
 #### PR #52 review
+
 - Reviewer: `VuntsJaHabe`
 - Review tulemus: **Approved**
 - Kommentaar: "Kõik tundub hea - tiimile tuleb anda teada, et nad oma nimed/username-d ka sisse lisaks tulevikus."
@@ -115,14 +129,17 @@ Tiimi liige tegi review'i ja jättis kommentaari.
 ## Part 5: Merging strategies (in GitHub GUI)
 
 ### Step 11: Use different merge types
+
 Kasutasin erinevaid merge strateegiaid PR-ide merge’imiseks `main` branchi GitHubis.
 
 #### Merge commit
+
 - PR #52: `docs/add-team-md` → `main`
 - Merge commit: `3daf1d9` — `Merge pull request #52 from taltech-vanemarendajaks/docs/add-team-md`
 - Tulemus: PR-i commitid jäid `main` branchi ajalukku eraldi commitidena + merge commit.
 
 #### Squash merge
+
 - PR #54: `docs/add-team-md` → `main`
 - Commit: `1412acb` — `docs(readme): updated overview text (#54)`
 - Tulemus: PR-i commitid ühendatakse üheks commit’iks `main` branchis.
@@ -130,33 +147,41 @@ Kasutasin erinevaid merge strateegiaid PR-ide merge’imiseks `main` branchi Git
 ### Step 12: Explain your choices
 
 #### Merge commit (PR #52)
+
 Valisin merge commit strateegia, kuna:
+
 - Säilitab täieliku PR-i ajaloo — näha on kõik individuaalsed commitid ja merge commit
 - Lihtne tagasi võtta — saab revert’ida terve merge commit’i korraga
 - Selge ajalugu — näha on, millal ja kuidas PR merge’iti
 
 #### Squash merge (PR #54)
+
 Valisin squash merge strateegia, kuna:
+
 - Lihtsustab `main` branchi ajalugu — üks selge commit PR-i kohta
 - Sobib väikeste muudatuste jaoks — PR-i sisu on üks loogiline muutus
 - Puhas ajalugu — vähem commit’e `main` branchis
 
 #### Probleemid
+
 **Squash merge'i puhul: Git ei tunne ära, et branch on merge'itud**
 
 Kui proovin kustutada `docs/add-team-md` branchi pärast squash merge'i (PR #54), siis:
+
 ```bash
 git branch -d docs/add-team-md
 # error: The branch 'docs/add-team-md' is not fully merged.
 ```
 
 **Miks see juhtub:**
+
 - Squash merge asendab originaalsed commitid (`c242eb5`, `f5acb59`) ühe commit'iga (`1412acb`)
 - Originaalsed commitid ei ole enam `main` branchi ajalugus
 - Git kontrollib, kas branchi commitid on `main`-is — kuna originaalsed commitid puuduvad, ei tunne Git ära, et branch on merge'itud
 - Peab kasutama `git branch -D` (force delete), mis on turvaline, kuna kõik muudatused on `main`-is (squash merge commit'ina)
 
 **Merge commit'i puhul:**
+
 - Originaalsed commitid jäävad `main` branchi ajalukku
 - Git tunneb ära, et branchi commitid on `main`-is
 - `git branch -d` töötab korralikult (safe delete)
@@ -166,6 +191,7 @@ See on squash merge'i oodatud omadus, mitte probleem — originaalsed commitid k
 ## Part 6: Final cleanup
 
 ### Step 13: Repository hygiene
+
 Kustutasin merge'itud feature branchid GitHubis ja veendusin, et `main` branch sisaldab kõiki lõplikke muudatusi.
 
 - Kustutatud branchid:
@@ -179,3 +205,31 @@ Kustutasin merge'itud feature branchid GitHubis ja veendusin, et `main` branch s
   - README.md muudatused (PR #54 squash merge: `1412acb`, PR #55 merge commit: `1126e65`)
 
 - Commit ajalugu: loetav ja selge, kasutasin merge commit'i (PR #52, PR #55) ja squash merge'i (PR #54) strateegiaid.
+
+---
+
+## Karl-Kristjan Küppas
+
+1. Issue description - Station selection, product loading, cart building, and sale submission logic are tightly coupled to React
+   component state and direct fetch calls, which makes it difficult to test or reuse this logic elsewhere (e.g. in hooks or service modules).
+2. Created branch: `refactor-pos-logic-into-reusable-modules`
+3. Solved the issue by refactoring existing code. Made no functional behaviour changes to the code.
+4. Git commands used with this homework:
+   - `git fetch origin`
+   - `git checkout refactor-pos-logic-into-reusable-modules`
+   - `git checkout -`
+   - `git checkout main`
+   - `git pull`
+   - `git merge main`
+   - `git add .`
+   - `git commit -m "commit-message"`
+   - `git push`
+   - `git push origin --delete refactor-pos-logic-into-reusable-modules`
+   - `git branch -d refactor-pos-logic-into-reusable-modules`
+5. PR - https://github.com/taltech-vanemarendajaks/Borsibaar-team19/pull/57
+6. Merged to `main` using merge commit because the commit history will remain intact and can be reverted if needed.
+7. Cleaned up origin, local.
+
+#### Notes:
+
+- Had no problems with git and doing the homework
