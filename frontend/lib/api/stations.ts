@@ -16,6 +16,21 @@ export async function fetchStationsForUser(
   return response.json();
 }
 
+export async function fetchStation(stationId: string): Promise<BarStation> {
+  const response = await fetch(`/api/backend/bar-stations/${stationId}`, {
+    cache: "no-store",
+  });
+
+  if (!response.ok) {
+    if (response.status === 403 || response.status === 404) {
+      throw new Error("You don't have access to this station");
+    }
+    throw new Error("Failed to fetch station");
+  }
+
+  return response.json();
+}
+
 export async function createStation(payload: {
   name: string;
   description: string;
