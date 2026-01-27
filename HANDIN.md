@@ -142,9 +142,40 @@ Valisin squash merge strateegia, kuna:
 - Puhas ajalugu — vähem commit’e `main` branchis
 
 #### Probleemid
-Probleeme merge strateegiatega pole olnud.
+**Squash merge'i puhul: Git ei tunne ära, et branch on merge'itud**
+
+Kui proovin kustutada `docs/add-team-md` branchi pärast squash merge'i (PR #54), siis:
+```bash
+git branch -d docs/add-team-md
+# error: The branch 'docs/add-team-md' is not fully merged.
+```
+
+**Miks see juhtub:**
+- Squash merge asendab originaalsed commitid (`c242eb5`, `f5acb59`) ühe commit'iga (`1412acb`)
+- Originaalsed commitid ei ole enam `main` branchi ajalugus
+- Git kontrollib, kas branchi commitid on `main`-is — kuna originaalsed commitid puuduvad, ei tunne Git ära, et branch on merge'itud
+- Peab kasutama `git branch -D` (force delete), mis on turvaline, kuna kõik muudatused on `main`-is (squash merge commit'ina)
+
+**Merge commit'i puhul:**
+- Originaalsed commitid jäävad `main` branchi ajalukku
+- Git tunneb ära, et branchi commitid on `main`-is
+- `git branch -d` töötab korralikult (safe delete)
+
+See on squash merge'i oodatud omadus, mitte probleem — originaalsed commitid kaovad tahtlikult, et lihtsustada `main` branchi ajalugu.
 
 ## Part 6: Final cleanup
 
 ### Step 13: Repository hygiene
+Kustutasin merge'itud feature branchid GitHubis ja veendusin, et `main` branch sisaldab kõiki lõplikke muudatusi.
 
+- Kustutatud branchid:
+  - `docs/add-team-md` (merge'itud PR #52 ja PR #54)
+    - Kustutasin lokaalselt: `git branch -D docs/add-team-md`
+    - Kustutasin GitHubis: `git push origin --delete docs/add-team-md`
+    - Märkus: squash merge'i tõttu pidi kasutama `-D` (force delete), kuna Git ei tunne ära, et branch on merge'itud
+
+- `main` branch sisaldab:
+  - `TEAM.md` fail (PR #52 merge commit: `3daf1d9`)
+  - README.md muudatused (PR #54 squash merge: `1412acb`, PR #55 merge commit: `1126e65`)
+
+- Commit ajalugu: loetav ja selge, kasutasin merge commit'i (PR #52, PR #55) ja squash merge'i (PR #54) strateegiaid.
