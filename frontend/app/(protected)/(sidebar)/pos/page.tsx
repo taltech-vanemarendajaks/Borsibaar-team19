@@ -6,11 +6,13 @@ import { AlertCircle, Store } from "lucide-react";
 import { StationManagementHeader } from "./StationManagementHeader";
 import { StationCard } from "./StationCard";
 import { CurrentUser, BarStation, User } from "./types";
+import { useAuthFetch } from "@/hooks/useAuthFetch";
 
 export const dynamic = "force-dynamic";
 
 export default function POSManagement() {
   const router = useRouter();
+  const authFetch = useAuthFetch();
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
   const [stations, setStations] = useState<BarStation[]>([]);
   const [allUsers, setAllUsers] = useState<User[]>([]);
@@ -20,9 +22,9 @@ export default function POSManagement() {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingStationId, setEditingStationId] = useState<number | null>(null);
 
-  const fetchCurrentUser = async () => {
+  const fetchCurrentUser = useCallback(async () => {
     try {
-      const response = await fetch("/api/backend/account");
+      const response = await authFetch("/api/backend/account");
       if (response.ok) {
         const data = await response.json();
         setCurrentUser(data);
@@ -32,7 +34,7 @@ export default function POSManagement() {
       console.error("Error fetching current user:", err);
     }
     return null;
-  };
+  }, [authFetch]);
 
   const fetchStations = useCallback(
     async (isAdmin: boolean) => {
@@ -41,7 +43,7 @@ export default function POSManagement() {
           ? "/api/backend/bar-stations"
           : "/api/backend/bar-stations/user";
 
-        const response = await fetch(url, { cache: "no-store" });
+        const response = await authFetch(url, { cache: "no-store" });
 
         if (!response.ok) {
           throw new Error("Failed to fetch stations");
@@ -63,12 +65,12 @@ export default function POSManagement() {
         setLoading(false);
       }
     },
-    [router]
+    [router, authFetch]
   );
 
   const fetchAllUsers = useCallback(async () => {
     try {
-      const response = await fetch("/api/backend/users", { cache: "no-store" });
+      const response = await authFetch("/api/backend/users", { cache: "no-store" });
       if (!response.ok) {
         const errorText = await response.text();
         throw new Error(errorText || "Failed to fetch users");
@@ -84,7 +86,7 @@ export default function POSManagement() {
       setAllUsers([]);
       setUserFetchError(message);
     }
-  }, []);
+  }, [authFetch]);
 
   useEffect(() => {
     const init = async () => {
@@ -100,7 +102,7 @@ export default function POSManagement() {
     };
 
     init();
-  }, [fetchStations, fetchAllUsers]);
+  }, [fetchStations, fetchAllUsers, fetchCurrentUser]);
 
   const handleCreateStation = async (data: {
     name: string;
@@ -114,7 +116,7 @@ export default function POSManagement() {
       userIds: data.userIds,
     };
 
-    const response = await fetch("/api/backend/bar-stations", {
+    const response = await authFetch("/api/backend/bar-stations", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -143,7 +145,7 @@ export default function POSManagement() {
       userIds: data.userIds,
     };
 
-    const response = await fetch(`/api/backend/bar-stations/${stationId}`, {
+    const response = await authFetch(`/api/backend/bar-stations/${stationId}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
@@ -163,7 +165,7 @@ export default function POSManagement() {
     }
 
     try {
-      const response = await fetch(`/api/backend/bar-stations/${stationId}`, {
+      const response = await authFetch(`/api/backend/bar-stations/${stationId}`, {
         method: "DELETE",
       });
 
@@ -174,8 +176,7 @@ export default function POSManagement() {
       await fetchStations(true);
     } catch (err) {
       alert(
-        `Error deleting station: ${
-          err instanceof Error ? err.message : "Unknown error"
+        `Error deleting station: ${err instanceof Error ? err.message : "Unknown error"
         }`
       );
     }
@@ -232,42 +233,42 @@ export default function POSManagement() {
 
   return (
     <div className="min-h-screen bg-background p-4 w-full">
-        <StationManagementHeader
-          isAdmin={isAdmin}
-          isCreateDialogOpen={isCreateDialogOpen}
-          onCreateDialogOpenChange={setIsCreateDialogOpen}
-          allUsers={allUsers}
-          userFetchError={userFetchError}
-          onCreate={handleCreateStation}
-        />
+      <StationManagementHeader
+        isAdmin={isAdmin}
+        isCreateDialogOpen={isCreateDialogOpen}
+        onCreateDialogOpenChange={setIsCreateDialogOpen}
+        allUsers={allUsers}
+        userFetchError={userFetchError}
+        onCreate={handleCreateStation}
+      />
 
-        {/* Stations Grid - Single column on tablets, multi-column on larger screens */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
-          {stations.map((station) => (
-            <StationCard
-              key={station.id}
-              station={station}
-              isAdmin={isAdmin}
-              allUsers={allUsers}
-              userFetchError={userFetchError}
-              editingStationId={editingStationId}
-              onEditClick={handleEditClick}
-              onEditClose={handleEditClose}
-              onUpdate={(data) => handleUpdateStation(station.id, data)}
-              onDelete={handleDeleteStation}
-            />
-          ))}
+      {/* Stations Grid - Single column on tablets, multi-column on larger screens */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
+        {stations.map((station) => (
+          <StationCard
+            key={station.id}
+            station={station}
+            isAdmin={isAdmin}
+            allUsers={allUsers}
+            userFetchError={userFetchError}
+            editingStationId={editingStationId}
+            onEditClick={handleEditClick}
+            onEditClose={handleEditClose}
+            onUpdate={(data) => handleUpdateStation(station.id, data)}
+            onDelete={handleDeleteStation}
+          />
+        ))}
+      </div>
+
+      {stations.length === 0 && isAdmin && (
+        <div className="text-center py-12">
+          <Store className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+          <p className="text-xl text-gray-100 mb-2">No stations yet</p>
+          <p className="text-sm text-gray-400 mb-4">
+            Create your first POS station to get started
+          </p>
         </div>
-
-        {stations.length === 0 && isAdmin && (
-          <div className="text-center py-12">
-            <Store className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <p className="text-xl text-gray-100 mb-2">No stations yet</p>
-            <p className="text-sm text-gray-400 mb-4">
-              Create your first POS station to get started
-            </p>
-          </div>
-        )}
+      )}
     </div>
   );
 }

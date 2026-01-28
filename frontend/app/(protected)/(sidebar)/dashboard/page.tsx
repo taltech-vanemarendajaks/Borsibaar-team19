@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { Input } from "@/components/ui/input";
+import { useAuthFetch } from "@/hooks/useAuthFetch";
 
 export const dynamic = "force-dynamic"; // still opt-out of caching
 
@@ -32,6 +33,7 @@ interface StationSalesStats {
 }
 
 export default function Dashboard() {
+  const authFetch = useAuthFetch();
   const [me, setMe] = useState<CurrentUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [orgName, setOrgName] = useState("-");
@@ -51,16 +53,12 @@ export default function Dashboard() {
     setLoading(true);
     setError(null);
     try {
-      // Fetch current user via frontend proxy (keeps cookies)
-      const userRes = await fetch("/api/backend/account", {
+      // replacing with authFetch
+      const userRes = await authFetch("/api/backend/account", {
         cache: "no-store",
       });
-      if (userRes.status === 401) {
-        setMe(null);
-        setLoading(false);
-        return;
-      }
       if (!userRes.ok) throw new Error(`Failed user fetch: ${userRes.status}`);
+
       const userJson: CurrentUser = await userRes.json();
       setMe(userJson);
 
@@ -68,7 +66,7 @@ export default function Dashboard() {
       if (userJson.organizationId) {
         // Fetch organization via Next.js proxy to avoid CORS and forward cookies
         try {
-          const orgRes = await fetch(
+          const orgRes = await authFetch(
             `/api/backend/organizations/${userJson.organizationId}`,
             { cache: "no-store" }
           );
@@ -90,7 +88,7 @@ export default function Dashboard() {
         }
 
         try {
-          const statsRes = await fetch(`/api/backend/inventory/sales-stats`, {
+          const statsRes = await authFetch(`/api/backend/inventory/sales-stats`, {
             cache: "no-store",
           });
           if (statsRes.ok) {
@@ -102,7 +100,7 @@ export default function Dashboard() {
         }
 
         try {
-          const stationStatsRes = await fetch(
+          const stationStatsRes = await authFetch(
             `/api/backend/inventory/station-sales-stats`,
             { cache: "no-store" }
           );
@@ -130,7 +128,7 @@ export default function Dashboard() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [authFetch]);
 
   useEffect(() => {
     fetchAll();
@@ -145,7 +143,7 @@ export default function Dashboard() {
     setSaveError(null);
     setSaveSuccess(null);
     try {
-      const res = await fetch(
+      const res = await authFetch(
         `/api/backend/organizations/${me.organizationId}`,
         {
           method: "PUT",
@@ -197,137 +195,136 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-background p-4">
-        <div className="rounded-lg bg-card p-6 shadow border-1 border-[color-mix(in oklab, var(--ring) 50%, transparent)]">
-          {error && (
-            <div className="mb-4 rounded border border-destructive/50 bg-destructive/10 px-4 py-2 text-sm text-destructive">
-              {error}
-            </div>
-          )}
-          <h1 className="text-3xl font-bold text-card-foreground mb-4">
-            Welcome, {me.name || me.email}!
-          </h1>
-          <div className="space-y-2 text-muted-foreground mb-6">
-            <p>
-              <span className="font-medium text-card-foreground">Email:</span>{" "}
-              {me.email}
-            </p>
-            <p>
-              <span className="font-medium text-card-foreground">
-                Organization:
-              </span>{" "}
-              {orgName}
-            </p>
-            <p>
-              <span className="font-medium text-card-foreground">Role:</span>{" "}
-              {me.role || "No role assigned"}
-            </p>
+      <div className="rounded-lg bg-card p-6 shadow border-1 border-[color-mix(in oklab, var(--ring) 50%, transparent)]">
+        {error && (
+          <div className="mb-4 rounded border border-destructive/50 bg-destructive/10 px-4 py-2 text-sm text-destructive">
+            {error}
           </div>
+        )}
+        <h1 className="text-3xl font-bold text-card-foreground mb-4">
+          Welcome, {me.name || me.email}!
+        </h1>
+        <div className="space-y-2 text-muted-foreground mb-6">
+          <p>
+            <span className="font-medium text-card-foreground">Email:</span>{" "}
+            {me.email}
+          </p>
+          <p>
+            <span className="font-medium text-card-foreground">
+              Organization:
+            </span>{" "}
+            {orgName}
+          </p>
+          <p>
+            <span className="font-medium text-card-foreground">Role:</span>{" "}
+            {me.role || "No role assigned"}
+          </p>
+        </div>
 
-          {stationStats.length > 0 && (
-            <div className="rounded-lg bg-card p-6 shadow mb-6">
-              <h2 className="text-xl font-semibold text-card-foreground mb-4">
-                Station Leaderboard
-              </h2>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-border">
-                      <th className="text-left py-2 text-muted-foreground font-medium">
-                        Station
-                      </th>
-                      <th className="text-left py-2 text-muted-foreground font-medium">
-                        Sales Count
-                      </th>
-                      <th className="text-left py-2 text-muted-foreground font-medium">
-                        Total Revenue
-                      </th>
+        {stationStats.length > 0 && (
+          <div className="rounded-lg bg-card p-6 shadow mb-6">
+            <h2 className="text-xl font-semibold text-card-foreground mb-4">
+              Station Leaderboard
+            </h2>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border">
+                    <th className="text-left py-2 text-muted-foreground font-medium">
+                      Station
+                    </th>
+                    <th className="text-left py-2 text-muted-foreground font-medium">
+                      Sales Count
+                    </th>
+                    <th className="text-left py-2 text-muted-foreground font-medium">
+                      Total Revenue
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {stationStats.map((stat) => (
+                    <tr
+                      key={stat.barStationId}
+                      className="border-b border-border last:border-0"
+                    >
+                      <td className="py-3">
+                        <div className="font-medium text-card-foreground">
+                          {stat.barStationName || `Station ${stat.barStationId}`}
+                        </div>
+                      </td>
+                      <td className="py-3 text-card-foreground font-medium">
+                        {stat.salesCount}
+                      </td>
+                      <td className="py-3 text-card-foreground font-medium">
+                        €{stat.totalRevenue.toFixed(2)}
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {stationStats.map((stat) => (
-                      <tr
-                        key={stat.barStationId}
-                        className="border-b border-border last:border-0"
-                      >
-                        <td className="py-3">
-                          <div className="font-medium text-card-foreground">
-                            {stat.barStationName || `Station ${stat.barStationId}`}
-                          </div>
-                        </td>
-                        <td className="py-3 text-card-foreground font-medium">
-                          {stat.salesCount}
-                        </td>
-                        <td className="py-3 text-card-foreground font-medium">
-                          €{stat.totalRevenue.toFixed(2)}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          )}
+          </div>
+        )}
 
-          {salesStats.length > 0 && (
-            <div className="rounded-lg bg-card p-6 shadow">
-              <h2 className="text-xl font-semibold text-card-foreground mb-4">
-                Sales Performance by User
-              </h2>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b border-border">
-                      <th className="text-left py-2 text-muted-foreground font-medium">
-                        User
-                      </th>
-                      <th className="text-left py-2 text-muted-foreground font-medium">
-                        Station
-                      </th>
-                      <th className="text-left py-2 text-muted-foreground font-medium">
-                        Sales Count
-                      </th>
-                      <th className="text-left py-2 text-muted-foreground font-medium">
-                        Total Revenue
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {salesStats.map((stat, index) => (
-                      <tr
-                        key={`${stat.userId}-${
-                          stat.barStationId || "null"
+        {salesStats.length > 0 && (
+          <div className="rounded-lg bg-card p-6 shadow">
+            <h2 className="text-xl font-semibold text-card-foreground mb-4">
+              Sales Performance by User
+            </h2>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border">
+                    <th className="text-left py-2 text-muted-foreground font-medium">
+                      User
+                    </th>
+                    <th className="text-left py-2 text-muted-foreground font-medium">
+                      Station
+                    </th>
+                    <th className="text-left py-2 text-muted-foreground font-medium">
+                      Sales Count
+                    </th>
+                    <th className="text-left py-2 text-muted-foreground font-medium">
+                      Total Revenue
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {salesStats.map((stat, index) => (
+                    <tr
+                      key={`${stat.userId}-${stat.barStationId || "null"
                         }-${index}`}
-                        className="border-b border-border last:border-0"
-                      >
-                        <td className="py-3">
-                          <div>
-                            <div className="font-medium text-card-foreground">
-                              {stat.userName || "Unknown User"}
-                            </div>
-                            <div className="text-xs text-muted-foreground">
-                              {stat.userEmail}
-                            </div>
+                      className="border-b border-border last:border-0"
+                    >
+                      <td className="py-3">
+                        <div>
+                          <div className="font-medium text-card-foreground">
+                            {stat.userName || "Unknown User"}
                           </div>
-                        </td>
-                        <td className="py-3 text-card-foreground">
-                          {stat.barStationName ||
-                            (stat.barStationId
-                              ? `Station ${stat.barStationId}`
-                              : "N/A")}
-                        </td>
-                        <td className="py-3 text-card-foreground font-medium">
-                          {stat.salesCount}
-                        </td>
-                        <td className="py-3 text-card-foreground font-medium">
-                          €{stat.totalRevenue.toFixed(2)}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                          <div className="text-xs text-muted-foreground">
+                            {stat.userEmail}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="py-3 text-card-foreground">
+                        {stat.barStationName ||
+                          (stat.barStationId
+                            ? `Station ${stat.barStationId}`
+                            : "N/A")}
+                      </td>
+                      <td className="py-3 text-card-foreground font-medium">
+                        {stat.salesCount}
+                      </td>
+                      <td className="py-3 text-card-foreground font-medium">
+                        €{stat.totalRevenue.toFixed(2)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          )}
+          </div>
+        )}
 
         {me.role === "ADMIN" && orgDetails && (
           <div>
@@ -366,12 +363,12 @@ export default function Dashboard() {
                       setOrgDetails((d) =>
                         d
                           ? {
-                              ...d,
-                              priceIncreaseStep:
-                                e.target.value === ""
-                                  ? undefined
-                                  : parseFloat(e.target.value),
-                            }
+                            ...d,
+                            priceIncreaseStep:
+                              e.target.value === ""
+                                ? undefined
+                                : parseFloat(e.target.value),
+                          }
                           : d
                       )
                     }
@@ -391,12 +388,12 @@ export default function Dashboard() {
                       setOrgDetails((d) =>
                         d
                           ? {
-                              ...d,
-                              priceDecreaseStep:
-                                e.target.value === ""
-                                  ? undefined
-                                  : parseFloat(e.target.value),
-                            }
+                            ...d,
+                            priceDecreaseStep:
+                              e.target.value === ""
+                                ? undefined
+                                : parseFloat(e.target.value),
+                          }
                           : d
                       )
                     }
