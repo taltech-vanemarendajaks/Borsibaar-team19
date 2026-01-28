@@ -3,7 +3,7 @@
 ## Team Members
 
 - Raigo Hõim - raigoh
-- [Lisa oma nimi] - [GitHub username]
+- Karmo Kupits - VuntsJaHabe
 - [Lisa oma nimi] - [GitHub username]
 - [Lisa oma nimi] - [GitHub username]
 - [Lisa oma nimi] - [GitHub username]
