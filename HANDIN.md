@@ -233,3 +233,21 @@ Kustutasin merge'itud feature branchid GitHubis ja veendusin, et `main` branch s
 #### Notes:
 
 - Had no problems with git and doing the homework
+
+## Karmo Kupits
+
+1. Issue description - Authentication errors (401 Unauthorized) were not handled consistently across the application. Many pages were using standard `fetch` directly, which meant users wouldn't be automatically redirected to the login page if their session expired or was invalid.
+2. Created branch: `feature/centralized-auth-error-hook`
+3. Solved the issue by implementing and integrating the `useAuthFetch` custom hook. This hook wraps the standard `fetch` API and adds a centralized check for 401 status codes, triggering a redirect to `/login` via the Next.js router. I updated the Dashboard, Client, and POS pages to use this hook instead of the native fetch.
+4. Git commands used with this homework:
+   - `git fetch origin`
+   - `git checkout feature/centralized-auth-error-hook`
+   - `git add .`
+   - `git commit -m "Implemented authFetch to 3 different page.tsx files"`
+   - `git push`
+5. PR - https://github.com/taltech-vanemarendajaks/Borsibaar-team19/pull/58
+6. Merged to `main` using merge commit to maintain a clear history of how the hook was integrated across multiple files.
+7. Cleaned up origin, local.
+
+#### Notes:
+- Encountered a TypeScript issue where I initially tried to import the hook as a plain function, but resolved it by following the Rules of Hooks and initializing it within the functional components.
