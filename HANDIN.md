@@ -251,3 +251,26 @@ Kustutasin merge'itud feature branchid GitHubis ja veendusin, et `main` branch s
 
 #### Notes:
 - Encountered a TypeScript issue where I initially tried to import the hook as a plain function, but resolved it by following the Rules of Hooks and initializing it within the functional components.
+  
+## Kaia Kolk-Ots
+
+1. Issue description - Error messages are mostly inline; using toasts/snackbars or a common error banner component would improve UX and consistency.
+2. Created branch: `Kaia`
+3. Solved the issue by implementing Snackbar component, use-api-errors hook and snackbar context.
+Created new files:
+- `frontend/app/api/utils/error-handler.ts`
+- `frontend/components/ui/snackbar.tsx`
+- `frontend/components/snackbar-container.tsx`
+- `frontend/contexts/snackbar-context.tsx`
+- `frontend/hooks/use-api-error.ts`
+4. Git commands used with this homework:
+   - `git pull origin`
+   - `git checkout -b "Kaia"`
+   - `git add .`
+   - `git status`
+   - `git commit -m "Implement snackbar, wrap api responses with snackbar"`
+   - `git push origin Kaia`
+5. PR - https://github.com/taltech-vanemarendajaks/Borsibaar-team19/pull/53
+6. Merged to `main` using merge commit to maintain a clear history of how Snackbar was integrated across multiple files.
+7. Cleaned up origin, local.
+
