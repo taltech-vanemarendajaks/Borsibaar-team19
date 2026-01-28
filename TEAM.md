@@ -4,7 +4,7 @@
 
 - Raigo Hõim - raigoh
 - Karmo Kupits - VuntsJaHabe
-- [Lisa oma nimi] - [GitHub username]
+- Herman Petrov - hermanpetrov
 - [Lisa oma nimi] - [GitHub username]
 - [Lisa oma nimi] - [GitHub username]
 
