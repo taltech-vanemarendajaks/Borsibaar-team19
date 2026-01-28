@@ -19,7 +19,15 @@ export async function GET(
 
         if (!response.ok) {
             const text = await response.text();
-            return new NextResponse(text, { status: response.status });
+            let errorMessage = text;
+            try {
+                const json = JSON.parse(text);
+                errorMessage = json.error || json.message || text;
+            } catch {}
+            return NextResponse.json(
+                { error: errorMessage || "Failed to fetch transaction history", status: response.status },
+                { status: response.status }
+            );
         }
 
         const data = await response.json();

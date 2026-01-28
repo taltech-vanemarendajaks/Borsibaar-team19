@@ -8,3 +8,4 @@ backend/.env
 nginx/ssl/
 *.pem
 *.key
+package-lock.json

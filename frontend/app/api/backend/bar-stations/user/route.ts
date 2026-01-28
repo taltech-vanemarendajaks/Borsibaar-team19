@@ -12,8 +12,13 @@ export async function GET(request: NextRequest) {
 
     if (!response.ok) {
       const errorText = await response.text();
+      let errorMessage = errorText;
+      try {
+        const json = JSON.parse(errorText);
+        errorMessage = json.error || json.message || errorText;
+      } catch {}
       return NextResponse.json(
-        { error: errorText || "Failed to fetch user bar stations" },
+        { error: errorMessage || "Failed to fetch user bar stations", status: response.status },
         { status: response.status }
       );
     }
