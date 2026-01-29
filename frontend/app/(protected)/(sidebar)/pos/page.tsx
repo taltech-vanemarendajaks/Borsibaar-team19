@@ -1,197 +1,36 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { AlertCircle, Store } from "lucide-react";
-import { useApiError } from "@/hooks/use-api-error";
 import { StationManagementHeader } from "./StationManagementHeader";
 import { StationCard } from "./StationCard";
-import { CurrentUser, BarStation, User } from "./types";
-import { useAuthFetch } from "@/hooks/useAuthFetch";
+import { BarStation } from "./types";
+import { usePosManagement } from "./hooks/usePosManagement";
 
 export const dynamic = "force-dynamic";
 
 export default function POSManagement() {
-  const router = useRouter();
-  const { handleError, handleFetchError } = useApiError();
-  const authFetch = useAuthFetch();
-  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
-  const [stations, setStations] = useState<BarStation[]>([]);
-  const [allUsers, setAllUsers] = useState<User[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [userFetchError, setUserFetchError] = useState<string | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [editingStationId, setEditingStationId] = useState<number | null>(null);
 
-  const fetchCurrentUser = useCallback(async () => {
-    try {
-      const response = await authFetch("/api/backend/account");
-      if (response.ok) {
-        const data = await response.json();
-        setCurrentUser(data);
-        return data;
-      } else {
-        await handleError(response, "Failed to fetch user account");
-      }
-    } catch (err) {
-      handleFetchError(err instanceof Error ? err : new Error("Failed to fetch current user"));
-    }
-    return null;
-  }, [authFetch, handleError, handleFetchError]);
+  const {
+    stations,
+    allUsers,
+    loading,
+    error,
+    userFetchError,
+    isAdmin,
+    handleCreateStation,
+    handleUpdateStation,
+    handleDeleteStation,
+  } = usePosManagement();
 
-  const fetchStations = useCallback(
-    async (isAdmin: boolean) => {
-      try {
-        const url = isAdmin
-          ? "/api/backend/bar-stations"
-          : "/api/backend/bar-stations/user";
-
-        const response = await authFetch(url, { cache: "no-store" });
-
-        if (!response.ok) {
-          await handleError(response, "Failed to fetch stations");
-          setError("Failed to fetch stations");
-          return;
-        }
-
-        const data = await response.json();
-        setStations(data);
-
-        // If non-admin with single station, auto-redirect
-        if (!isAdmin && data.length === 1) {
-          router.push(`/pos/${data[0].id}`);
-          return;
-        }
-
-        setError(null);
-      } catch (err) {
-        const message = err instanceof Error ? err.message : "Unknown error";
-        handleFetchError(err instanceof Error ? err : new Error(message));
-        setError(message);
-      } finally {
-        setLoading(false);
-      }
-    },
-    [router, handleError, handleFetchError, authFetch]
-  );
-
-  const fetchAllUsers = useCallback(async () => {
-    try {
-      const response = await authFetch("/api/backend/users", { cache: "no-store" });
-      if (!response.ok) {
-        await handleError(response, "Failed to fetch users");
-        setAllUsers([]);
-        return;
-      }
-
-      const data = await response.json();
-      setAllUsers(data);
-      setUserFetchError(null);
-    } catch (err) {
-      handleFetchError(err instanceof Error ? err : new Error("Failed to fetch users"));
-      setAllUsers([]);
-    }
-  }, [handleError, handleFetchError, authFetch]);
-
-  useEffect(() => {
-    const init = async () => {
-      const user = await fetchCurrentUser();
-      if (user) {
-        const isAdmin = user.role === "ADMIN";
-        await fetchStations(isAdmin);
-
-        if (isAdmin) {
-          await fetchAllUsers();
-        }
-      }
-    };
-
-    init();
-  }, [fetchStations, fetchAllUsers, fetchCurrentUser]);
-
-  const handleCreateStation = async (data: {
-    name: string;
-    description: string;
-    userIds: string[];
-  }) => {
-    const payload = {
-      name: data.name,
-      description: data.description,
-      isActive: true,
-      userIds: data.userIds,
-    };
-
-    try {
-      const response = await authFetch("/api/backend/bar-stations", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        await handleError(response, "Failed to create station");
-        return;
-      }
-
-      await fetchStations(true);
-    } catch (err) {
-      handleFetchError(err instanceof Error ? err : new Error("Failed to create station"));
-    }
-  };
-
-  const handleUpdateStation = async (
-    stationId: number,
-    data: {
-      name: string;
-      description: string;
-      userIds: string[];
-    }
-  ) => {
-    const payload = {
-      name: data.name,
-      description: data.description,
-      isActive: true,
-      userIds: data.userIds,
-    };
-
-    try {
-      const response = await authFetch(`/api/backend/bar-stations/${stationId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        await handleError(response, "Failed to update station");
-        return;
-      }
-
-      await fetchStations(true);
-    } catch (err) {
-      handleFetchError(err instanceof Error ? err : new Error("Failed to update station"));
-    }
-  };
-
-  const handleDeleteStation = async (stationId: number) => {
+  const onDeleteStation = async (stationId: number) => {
     if (!confirm("Are you sure you want to delete this station?")) {
       return;
     }
 
-    try {
-      const response = await authFetch(`/api/backend/bar-stations/${stationId}`, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) {
-        await handleError(response, "Failed to delete station");
-        return;
-      }
-
-      await fetchStations(true);
-    } catch (err) {
-      handleFetchError(err instanceof Error ? err : new Error("Failed to delete station"));
-    }
+    await handleDeleteStation(stationId);
   };
 
   const handleEditClick = (station: BarStation) => {
@@ -223,8 +62,6 @@ export default function POSManagement() {
       </div>
     );
   }
-
-  const isAdmin = currentUser?.role === "ADMIN";
 
   // Non-admin with no stations
   if (!isAdmin && stations.length === 0) {
@@ -267,7 +104,7 @@ export default function POSManagement() {
             onEditClick={handleEditClick}
             onEditClose={handleEditClose}
             onUpdate={(data) => handleUpdateStation(station.id, data)}
-            onDelete={handleDeleteStation}
+            onDelete={onDeleteStation}
           />
         ))}
       </div>
