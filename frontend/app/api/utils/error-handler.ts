@@ -14,6 +14,12 @@ export function handleApiError(
 
   let errorMessage = defaultMessage;
   let errorDetails = null;
+  let statusCode = 500;
+
+  if (error && typeof error === "object" && "status" in error){
+    statusCode=(error as any).status
+  }
+
 
   if (error instanceof Error) {
     errorMessage = error.message;
@@ -27,9 +33,9 @@ export function handleApiError(
     {
       error: errorMessage,
       details: errorDetails,
-      status: 500,
+      status: statusCode,
     },
-    { status: 500 }
+    { status: statusCode }
   );
 }
 
@@ -39,11 +45,13 @@ export function handleResponseError(
   defaultMessage: string
 ): NextResponse<ApiErrorResponse> {
   let errorMessage = responseText || defaultMessage;
+  let details = undefined;
 
   // Try to parse if it's JSON
   try {
     const parsed = JSON.parse(responseText);
     errorMessage = parsed.error || parsed.message || defaultMessage;
+    details = parsed.details || parsed.trace;
   } catch {
     // Not JSON, use as-is
   }
@@ -51,6 +59,7 @@ export function handleResponseError(
   return NextResponse.json(
     {
       error: errorMessage,
+      details: details,
       status,
     },
     { status }
