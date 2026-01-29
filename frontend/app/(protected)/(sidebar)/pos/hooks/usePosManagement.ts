@@ -11,9 +11,11 @@ import {
   fetchStationsForUser,
   updateStation,
 } from "@/lib/api/stations";
+import { useApiError } from "@/hooks/use-api-error";
 
 export function usePosManagement() {
   const router = useRouter();
+  const { handleFetchError } = useApiError();
 
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
   const [stations, setStations] = useState<BarStation[]>([]);
@@ -54,10 +56,11 @@ export function usePosManagement() {
             setAllUsers(users);
             setUserFetchError(null);
           } catch (err) {
-            const message =
-              err instanceof Error ? err.message : "Failed to fetch users";
+            const errData = handleFetchError(
+              err instanceof Error ? err : new Error("Failed to fetch users"),
+            );
             setAllUsers([]);
-            setUserFetchError(message);
+            setUserFetchError(errData.error);
           }
         }
       } catch (err) {
@@ -68,7 +71,7 @@ export function usePosManagement() {
     };
 
     init();
-  }, [router, refreshStations]);
+  }, [router, refreshStations, handleFetchError]);
 
   const handleCreateStation = useCallback(
     async (data: { name: string; description: string; userIds: string[] }) => {
@@ -78,12 +81,17 @@ export function usePosManagement() {
         isActive: true,
         userIds: data.userIds,
       };
-
-      await createStation(payload);
-      const admin = currentUser?.role === "ADMIN";
-      if (admin) await refreshStations(true);
+      try {
+        await createStation(payload);
+        const admin = currentUser?.role === "ADMIN";
+        if (admin) await refreshStations(true);
+      } catch (err) {
+        handleFetchError(
+          err instanceof Error ? err : new Error("Failed to create station"),
+        );
+      }
     },
-    [refreshStations, currentUser],
+    [refreshStations, currentUser, handleFetchError],
   );
 
   const handleUpdateStation = useCallback(
@@ -98,18 +106,30 @@ export function usePosManagement() {
         userIds: data.userIds,
       };
 
-      await updateStation(stationId, payload);
-      await refreshStations(true);
+      try {
+        await updateStation(stationId, payload);
+        await refreshStations(true);
+      } catch (err) {
+        handleFetchError(
+          err instanceof Error ? err : new Error("Failed to update station"),
+        );
+      }
     },
-    [refreshStations],
+    [refreshStations, handleFetchError],
   );
 
   const handleDeleteStation = useCallback(
     async (stationId: number) => {
-      await deleteStation(stationId);
-      await refreshStations(true);
+      try {
+        await deleteStation(stationId);
+        await refreshStations(true);
+      } catch (err) {
+        handleFetchError(
+          err instanceof Error ? err : new Error("Failed to delete station"),
+        );
+      }
     },
-    [refreshStations],
+    [refreshStations, handleFetchError],
   );
 
   const isAdmin = currentUser?.role === "ADMIN";
