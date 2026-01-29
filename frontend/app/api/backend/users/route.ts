@@ -12,8 +12,13 @@ export async function GET(request: NextRequest) {
 
     if (!response.ok) {
       const errorText = await response.text();
+      let errorMessage = errorText;
+      try {
+        const json = JSON.parse(errorText);
+        errorMessage = json.error || json.message || errorText;
+      } catch {}
       return NextResponse.json(
-        { error: errorText || "Failed to fetch users" },
+        { error: errorMessage || "Failed to fetch users", status: response.status },
         { status: response.status }
       );
     }
@@ -23,7 +28,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error("Error fetching users:", error);
     return NextResponse.json(
-      { error: "Failed to fetch users" },
+      { error: "Failed to fetch users", status: 500 },
       { status: 500 }
     );
   }

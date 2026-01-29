@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { Input } from "@/components/ui/input";
+import { useApiError } from "@/hooks/use-api-error";
 
 export const dynamic = "force-dynamic"; // still opt-out of caching
 
@@ -32,6 +33,7 @@ interface StationSalesStats {
 }
 
 export default function Dashboard() {
+  const { handleError, handleFetchError } = useApiError();
   const [me, setMe] = useState<CurrentUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [orgName, setOrgName] = useState("-");
@@ -60,7 +62,11 @@ export default function Dashboard() {
         setLoading(false);
         return;
       }
-      if (!userRes.ok) throw new Error(`Failed user fetch: ${userRes.status}`);
+      if (!userRes.ok) {
+        await handleError(userRes, "Failed to fetch user account");
+        setLoading(false);
+        return;
+      }
       const userJson: CurrentUser = await userRes.json();
       setMe(userJson);
 
@@ -84,8 +90,12 @@ export default function Dashboard() {
                 ? parseFloat(org.priceDecreaseStep)
                 : undefined,
             });
-          } else setOrgName("Unknown Organization");
-        } catch {
+          } else {
+            await handleError(orgRes, "Failed to fetch organization");
+            setOrgName("Unknown Organization");
+          }
+        } catch (err) {
+          handleFetchError(err instanceof Error ? err : new Error("Failed to fetch organization"));
           setOrgName("Unknown Organization");
         }
 
@@ -96,9 +106,11 @@ export default function Dashboard() {
           if (statsRes.ok) {
             const statsJson = await statsRes.json();
             if (Array.isArray(statsJson)) setSalesStats(statsJson);
+          } else {
+            await handleError(statsRes, "Failed to fetch sales statistics");
           }
-        } catch {
-          // ignore stats errors silently
+        } catch (err) {
+          handleFetchError(err instanceof Error ? err : new Error("Failed to fetch sales statistics"));
         }
 
         try {
@@ -109,9 +121,11 @@ export default function Dashboard() {
           if (stationStatsRes.ok) {
             const stationStatsJson = await stationStatsRes.json();
             if (Array.isArray(stationStatsJson)) setStationStats(stationStatsJson);
+          } else {
+            await handleError(stationStatsRes, "Failed to fetch station sales statistics");
           }
-        } catch {
-          // ignore stats errors silently
+        } catch (err) {
+          handleFetchError(err instanceof Error ? err : new Error("Failed to fetch station sales statistics"));
         }
       } else {
         setOrgName("No organization");
@@ -127,10 +141,11 @@ export default function Dashboard() {
       }
       if (hasMessage(e)) setError(e.message);
       else setError("Failed to load dashboard");
+      handleFetchError(e instanceof Error ? e : new Error("Failed to load dashboard"));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [handleError, handleFetchError]);
 
   useEffect(() => {
     fetchAll();
@@ -157,7 +172,10 @@ export default function Dashboard() {
           }),
         }
       );
-      if (!res.ok) throw new Error(`Update failed: ${res.status}`);
+      if (!res.ok) {
+        await handleError(res, "Failed to update organization");
+        return;
+      }
       const updated = await res.json();
       setOrgDetails({
         name: updated.name,
@@ -170,11 +188,9 @@ export default function Dashboard() {
       });
       setSaveSuccess("Organization updated successfully");
     } catch (err) {
-      setSaveError(
-        err instanceof Error
-          ? err.message
-          : "Failed to update organization"
-      );
+      const message = err instanceof Error ? err.message : "Failed to update organization";
+      setSaveError(message);
+      handleFetchError(err instanceof Error ? err : new Error(message));
     } finally {
       setSaving(false);
     }

@@ -13,13 +13,15 @@ export async function GET(request: NextRequest) {
 
     if (!response.ok) {
       const text = await response.text();
-      return new NextResponse(text, {
-        status: response.status,
-        headers: {
-          "Content-Type":
-            response.headers.get("content-type") || "application/json",
-        },
-      });
+      let errorMessage = text;
+      try {
+        const json = JSON.parse(text);
+        errorMessage = json.error || json.message || text;
+      } catch {}
+      return NextResponse.json(
+        { error: errorMessage || "Failed to fetch organizations", status: response.status },
+        { status: response.status }
+      );
     }
 
     const data = await response.json();

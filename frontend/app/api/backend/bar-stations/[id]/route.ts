@@ -19,8 +19,13 @@ export async function GET(
 
     if (!response.ok) {
       const errorText = await response.text();
+      let errorMessage = errorText;
+      try {
+        const json = JSON.parse(errorText);
+        errorMessage = json.error || json.message || errorText;
+      } catch {}
       return NextResponse.json(
-        { error: errorText || "Failed to fetch bar station" },
+        { error: errorMessage || "Failed to fetch bar station", status: response.status },
         { status: response.status }
       );
     }
@@ -59,8 +64,13 @@ export async function PUT(
 
     if (!response.ok) {
       const errorText = await response.text();
+      let errorMessage = errorText;
+      try {
+        const json = JSON.parse(errorText);
+        errorMessage = json.error || json.message || errorText;
+      } catch {}
       return NextResponse.json(
-        { error: errorText || "Failed to update bar station" },
+        { error: errorMessage || "Failed to update bar station", status: response.status },
         { status: response.status }
       );
     }
@@ -95,8 +105,13 @@ export async function DELETE(
 
     if (!response.ok) {
       const errorText = await response.text();
+      let errorMessage = errorText;
+      try {
+        const json = JSON.parse(errorText);
+        errorMessage = json.error || json.message || errorText;
+      } catch {}
       return NextResponse.json(
-        { error: errorText || "Failed to delete bar station" },
+        { error: errorMessage || "Failed to delete bar station", status: response.status },
         { status: response.status }
       );
     }

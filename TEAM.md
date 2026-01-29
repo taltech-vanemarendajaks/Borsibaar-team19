@@ -4,7 +4,8 @@
 
 - Raigo Hõim - raigoh
 - Karl-Kristjan Küppas - karlkuppas
-- [Lisa oma nimi] - [GitHub username]
+- Karmo Kupits - VuntsJaHabe
+- Herman Petrov - hermanpetrov
 - [Lisa oma nimi] - [GitHub username]
 - [Lisa oma nimi] - [GitHub username]
 

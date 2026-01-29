@@ -30,15 +30,7 @@ export default function POSManagement() {
       return;
     }
 
-    try {
-      await handleDeleteStation(stationId);
-    } catch (err) {
-      alert(
-        `Error deleting station: ${
-          err instanceof Error ? err.message : "Unknown error"
-        }`,
-      );
-    }
+    await handleDeleteStation(stationId);
   };
 
   const handleEditClick = (station: BarStation) => {

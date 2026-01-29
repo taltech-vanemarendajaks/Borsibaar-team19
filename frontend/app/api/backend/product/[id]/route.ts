@@ -17,7 +17,15 @@ export async function DELETE(
         });
         if (!response.ok) {
             const text = await response.text();
-            return new NextResponse(text, { status: response.status });
+            let errorMessage = text;
+            try {
+                const json = JSON.parse(text);
+                errorMessage = json.error || json.message || text;
+            } catch {}
+            return NextResponse.json(
+                { error: errorMessage || "Failed to delete product", status: response.status },
+                { status: response.status }
+            );
         }
 
         return NextResponse.json({ status: response.status });

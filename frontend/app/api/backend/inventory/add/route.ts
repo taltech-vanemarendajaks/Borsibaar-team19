@@ -16,7 +16,15 @@ export async function POST(request: NextRequest) {
         });
         if (!response.ok) {
             const text = await response.text();
-            return new NextResponse(text, { status: response.status });
+            let errorMessage = text;
+            try {
+                const json = JSON.parse(text);
+                errorMessage = json.error || json.message || text;
+            } catch {}
+            return NextResponse.json(
+                { error: errorMessage || "Failed to add stock", status: response.status },
+                { status: response.status }
+            );
         }
 
         const data = await response.json();
@@ -24,7 +32,7 @@ export async function POST(request: NextRequest) {
     } catch (error) {
         console.error("Proxy error:", error);
         return NextResponse.json(
-            { error: "Failed to add stock" },
+            { error: "Failed to add stock", status: 500 },
             { status: 500 }
         );
     }

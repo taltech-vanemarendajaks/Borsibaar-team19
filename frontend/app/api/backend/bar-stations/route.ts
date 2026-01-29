@@ -12,8 +12,13 @@ export async function GET(request: NextRequest) {
 
     if (!response.ok) {
       const errorText = await response.text();
+      let errorMessage = errorText;
+      try {
+        const json = JSON.parse(errorText);
+        errorMessage = json.error || json.message || errorText;
+      } catch {}
       return NextResponse.json(
-        { error: errorText || "Failed to fetch bar stations" },
+        { error: errorMessage || "Failed to fetch bar stations", status: response.status },
         { status: response.status }
       );
     }
@@ -23,7 +28,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error("Error fetching bar stations:", error);
     return NextResponse.json(
-      { error: "Failed to fetch bar stations" },
+      { error: "Failed to fetch bar stations", status: 500 },
       { status: 500 }
     );
   }
@@ -45,8 +50,13 @@ export async function POST(request: NextRequest) {
 
     if (!response.ok) {
       const errorText = await response.text();
+      let errorMessage = errorText;
+      try {
+        const json = JSON.parse(errorText);
+        errorMessage = json.error || json.message || errorText;
+      } catch {}
       return NextResponse.json(
-        { error: errorText || "Failed to create bar station" },
+        { error: errorMessage || "Failed to create bar station", status: response.status },
         { status: response.status }
       );
     }
@@ -56,7 +66,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error("Error creating bar station:", error);
     return NextResponse.json(
-      { error: "Failed to create bar station" },
+      { error: "Failed to create bar station", status: 500 },
       { status: 500 }
     );
   }
