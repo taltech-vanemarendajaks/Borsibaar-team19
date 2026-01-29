@@ -22,13 +22,16 @@ export async function GET(
 
     // Pass through non-OK responses as-is (text or json)
     if (!response.ok) {
-      const contentType = response.headers.get("content-type") || "";
-      if (contentType.includes("application/json")) {
-        const json = await response.json();
-        return NextResponse.json(json, { status: response.status });
-      }
       const text = await response.text();
-      return new NextResponse(text, { status: response.status });
+      let errorMessage = text;
+      try {
+        const json = JSON.parse(text);
+        errorMessage = json.error || json.message || text;
+      } catch {}
+      return NextResponse.json(
+        { error: errorMessage || "Failed to fetch organization", status: response.status },
+        { status: response.status }
+      );
     }
 
     const data = await response.json();
@@ -68,7 +71,15 @@ export async function PUT(
     // Pass through non-OK responses as-is (text or json)
       if (!response.ok) {
           const text = await response.text();
-          return new NextResponse(text, { status: response.status });
+          let errorMessage = text;
+          try {
+              const json = JSON.parse(text);
+              errorMessage = json.error || json.message || text;
+          } catch {}
+          return NextResponse.json(
+              { error: errorMessage || "Failed to update organization", status: response.status },
+              { status: response.status }
+          );
       }
 
     const data = await response.json();

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { AlertCircle, Store } from "lucide-react";
+import { useApiError } from "@/hooks/use-api-error";
 import { StationManagementHeader } from "./StationManagementHeader";
 import { StationCard } from "./StationCard";
 import { CurrentUser, BarStation, User } from "./types";
@@ -12,6 +13,7 @@ export const dynamic = "force-dynamic";
 
 export default function POSManagement() {
   const router = useRouter();
+  const { handleError, handleFetchError } = useApiError();
   const authFetch = useAuthFetch();
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
   const [stations, setStations] = useState<BarStation[]>([]);
@@ -29,12 +31,14 @@ export default function POSManagement() {
         const data = await response.json();
         setCurrentUser(data);
         return data;
+      } else {
+        await handleError(response, "Failed to fetch user account");
       }
     } catch (err) {
-      console.error("Error fetching current user:", err);
+      handleFetchError(err instanceof Error ? err : new Error("Failed to fetch current user"));
     }
     return null;
-  }, [authFetch]);
+  }, [authFetch, handleError, handleFetchError]);
 
   const fetchStations = useCallback(
     async (isAdmin: boolean) => {
@@ -46,7 +50,9 @@ export default function POSManagement() {
         const response = await authFetch(url, { cache: "no-store" });
 
         if (!response.ok) {
-          throw new Error("Failed to fetch stations");
+          await handleError(response, "Failed to fetch stations");
+          setError("Failed to fetch stations");
+          return;
         }
 
         const data = await response.json();
@@ -60,33 +66,33 @@ export default function POSManagement() {
 
         setError(null);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Unknown error");
+        const message = err instanceof Error ? err.message : "Unknown error";
+        handleFetchError(err instanceof Error ? err : new Error(message));
+        setError(message);
       } finally {
         setLoading(false);
       }
     },
-    [router, authFetch]
+    [router, handleError, handleFetchError, authFetch]
   );
 
   const fetchAllUsers = useCallback(async () => {
     try {
       const response = await authFetch("/api/backend/users", { cache: "no-store" });
       if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(errorText || "Failed to fetch users");
+        await handleError(response, "Failed to fetch users");
+        setAllUsers([]);
+        return;
       }
 
       const data = await response.json();
       setAllUsers(data);
       setUserFetchError(null);
     } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Failed to fetch users";
-      console.error("Error fetching users:", err);
+      handleFetchError(err instanceof Error ? err : new Error("Failed to fetch users"));
       setAllUsers([]);
-      setUserFetchError(message);
     }
-  }, [authFetch]);
+  }, [handleError, handleFetchError, authFetch]);
 
   useEffect(() => {
     const init = async () => {
@@ -116,18 +122,22 @@ export default function POSManagement() {
       userIds: data.userIds,
     };
 
-    const response = await authFetch("/api/backend/bar-stations", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    try {
+      const response = await authFetch("/api/backend/bar-stations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(errorText || "Failed to create station");
+      if (!response.ok) {
+        await handleError(response, "Failed to create station");
+        return;
+      }
+
+      await fetchStations(true);
+    } catch (err) {
+      handleFetchError(err instanceof Error ? err : new Error("Failed to create station"));
     }
-
-    await fetchStations(true);
   };
 
   const handleUpdateStation = async (
@@ -145,18 +155,22 @@ export default function POSManagement() {
       userIds: data.userIds,
     };
 
-    const response = await authFetch(`/api/backend/bar-stations/${stationId}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    try {
+      const response = await authFetch(`/api/backend/bar-stations/${stationId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(errorText || "Failed to update station");
+      if (!response.ok) {
+        await handleError(response, "Failed to update station");
+        return;
+      }
+
+      await fetchStations(true);
+    } catch (err) {
+      handleFetchError(err instanceof Error ? err : new Error("Failed to update station"));
     }
-
-    await fetchStations(true);
   };
 
   const handleDeleteStation = async (stationId: number) => {
@@ -170,15 +184,13 @@ export default function POSManagement() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to delete station");
+        await handleError(response, "Failed to delete station");
+        return;
       }
 
       await fetchStations(true);
     } catch (err) {
-      alert(
-        `Error deleting station: ${err instanceof Error ? err.message : "Unknown error"
-        }`
-      );
+      handleFetchError(err instanceof Error ? err : new Error("Failed to delete station"));
     }
   };
 
