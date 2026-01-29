@@ -4,6 +4,7 @@ import clsx from "clsx";
 import React, { useEffect, useState } from "react";
 import Chart from "./Chart";
 import Image from "next/image";
+import { useAuthFetch } from "@/hooks/useAuthFetch";
 
 type Category = { id: number; name: string; organizationId?: number };
 export type InvDto = {
@@ -28,11 +29,12 @@ const sponsors = [
   { name: "Red Bull", logo: "/redbull.svg" },
   { name: "itük", logo: "/ituk_long_nottu_red.svg" },
   { name: "alecoq", logo: "/alecoq.svg" },
-  { name: "insük", logo: "/insyk.png"},
-  { name: "anora", logo: "/anora-group-logo-white-CMYK.png"}
+  { name: "insük", logo: "/insyk.png" },
+  { name: "anora", logo: "/anora-group-logo-white-CMYK.png" }
 ];
 
 export default function ClientProductsByCategory() {
+  const authFetch = useAuthFetch();
   const [cats, setCats] = useState<Category[]>([]);
   const [groups, setGroups] = useState<Record<string, InvDto[]>>({});
   const [loading, setLoading] = useState(false);
@@ -46,7 +48,7 @@ export default function ClientProductsByCategory() {
       try {
         const organizationId = 2;
 
-        const cRes = await fetch(
+        const cRes = await authFetch(
           `/api/backend/categories?organizationId=${organizationId}`,
           {
             cache: "no-store",
@@ -63,7 +65,7 @@ export default function ClientProductsByCategory() {
         setCats(categoryList);
 
         const fetches = categoryList.map(async (c) => {
-          const res = await fetch(
+          const res = await authFetch(
             `/api/backend/inventory?categoryId=${c.id}&organizationId=${organizationId}`,
             {
               cache: "no-store",
@@ -101,7 +103,7 @@ export default function ClientProductsByCategory() {
       clearInterval(refreshInterval);
       alive = false;
     };
-  }, []);
+  }, [authFetch]);
 
   const totalItems = Object.values(groups).reduce(
     (sum, arr) => sum + arr.length,
