@@ -4,7 +4,7 @@ stages:
 
 variables:
   SSH_USER: "ubuntu"
-  SERVER_IP: "193.40.157.19"
+  SERVER_IP: "193.40.157.195"
   DEPLOY_PATH: "/srv/borsibaar"
   DOCKER_COMPOSE_FILE: "docker-compose.prod.yaml"
 

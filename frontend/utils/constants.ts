@@ -8,7 +8,7 @@
  *
  * NEXT_PUBLIC_BACKEND_URL: For client-side browser access (Browser → Backend)
  *   - Development: http://localhost:8080
- *   - Production: http://193.40.157.19:8080 (public URL)
+ *   - Production: http://193.40.157.195:8080 (public URL)
  *   - Used by: OAuth login button in login page
  *
  * Note: Browser API calls go through Next.js proxy, not directly to backend
