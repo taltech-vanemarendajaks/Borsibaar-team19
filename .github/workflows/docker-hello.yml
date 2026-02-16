@@ -1,0 +1,25 @@
+name: Docker Hello World
+
+on:
+  workflow_dispatch:
+
+jobs:
+  docker-hello:
+    runs-on: self-hosted
+
+    steps:
+      - name: Check Docker installation
+        run: |
+          echo "Checking Docker installation..."
+          docker --version
+          docker ps
+
+      - name: Run Docker Hello World
+        run: |
+          echo "Running Docker Hello World..."
+          docker run --rm hello-world
+
+      - name: Success message
+        run: |
+          echo "✅ Job Run Docker Hello World completed with result: Succeeded"
+          echo "Runner is working correctly!"
